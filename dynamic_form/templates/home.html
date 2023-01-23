@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+<div class="box">
+  <h1>Welcome {{ user.first_name }}</h1>
+  <h2> You are logged in </h2>
+  <p>{{ message }}</p>
+  <a href="{{ link }}"><button type="button" class="btn btn-primary">{{ link_text }}</button></a>
+</div>
+{% endblock %}

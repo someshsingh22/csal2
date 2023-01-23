@@ -1,0 +1,30 @@
+body {
+    font-family: sans-serif;
+    background-image: linear-gradient(#E3F2FD, #BBDEFB);
+    display: flex;
+    align-items: center;
+    height: 100vh;
+}
+
+.box {
+    max-width: 80%;
+    margin: auto;
+    background-color: #FAF9F6;
+    padding-left: 20%;
+    padding-right: 20%;
+    padding-top: 10%;
+    padding-bottom: 10%;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+.box h1 {
+    margin: 0 0 20px 0;
+    text-align: center;
+    color: #1565C0;
+}
+.box h2 {
+    margin: 0 0 20px 0;
+    text-align: center;
+    color: #444;
+}

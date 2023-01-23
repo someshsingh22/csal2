@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="box" id="play">
+    <video id="video" style="width: 0%;"><source src="{{ src }}" type="video/mp4"></video>
+    <h2>Click to play video</h2>
+    <button class="btn btn-primary" id="button_play" onclick="play({{ timer }}, {{ gaze }})">Play Video</button>
+</div>
+
+<form id="check" hidden method="post">
+    <h2> Complete this in 10 seconds! </h2>
+    {% csrf_token %}
+    {{ attn_form.as_p }}
+    <input class="btn btn-primary" type="button" value="submit" onclick="sequel({{ time_limit }})">
+</form>
+<form id="gaze" hidden method="post">
+    <h2> Press next to go to the next video </h2>
+    {% csrf_token %}
+    {{ gaze_form.as_p }}
+    <button class="btn btn-primary" id="record" onclick="end()" type="submit">Next</button>
+</form>
+{% endblock %}
+{% block script %}
+<script src="{% static '/js/webgazer/webgazer.js'%}" ></script>
+<script src="{% static '/js/video.js'%}" ></script>
+{% endblock %}

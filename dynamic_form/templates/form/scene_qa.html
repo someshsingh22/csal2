@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <title>SceneQA</title>
+  <style>
+    body {
+      background-image: linear-gradient(#E3F2FD, #BBDEFB);
+    }
+    .container {
+      margin: 0 auto;
+    }
+
+    .container-1 {
+      height: 60%;
+      margin: 0 auto;
+    }
+
+    .container-2 {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+      height: 25%;
+      text-align: center;
+      margin: 0 auto;
+    }
+    img {
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container container-1">
+    <img src="{{ scene }}" alt="Image" class="img-fluid">
+  </div>
+  <div class="container container-2">
+      <h2>I remember watching this scene in the experiment</h2>
+      <div class="col mr-auto ml-auto">
+        <form method="post">
+          {% csrf_token %}
+          {% for hidden_field in form.hidden_fields %}
+              {{ hidden_field }}
+          {% endfor %}
+          <div class="form-group">
+            <div class="row">
+              <div class="col-4">{{ form.seen.0 }}</div>
+              <div class="col-4">{{ form.seen.1 }}</div>
+              <div class="col-4">
+                <button type="submit" class="btn btn-primary">Submit</button>
+              </div>
+            </div>
+          </div>
+        </form>
+    </div>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

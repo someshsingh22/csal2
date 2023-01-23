@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% block style %}
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+{% endblock %}
+{% block content %}
+<form method="post"> {% csrf_token %} {% for hidden_field in form.hidden_fields %} {{ hidden_field }} {% endfor %}
+  <div class="form-group">
+  <h1>Please Fill out the form below!<h1>
+    <h3>{{ form.brands_seen.label }}</h3></span>
+    <div class="form-options">
+      <div class="row">
+        <div class="col-4">
+          {{ form.brands_seen.0 }}{{ form.brands_seen.0.label }}
+        </div>
+        <div class="col-4">
+          {{ form.brands_seen.1 }}{{ form.brands_seen.1.label }}
+        </div>
+        <div class="col-4">
+          {{ form.brands_seen.2 }}{{ form.brands_seen.2.label }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-4">
+          {{ form.brands_seen.3 }}{{ form.brands_seen.3.label }}
+        </div>
+        <div class="col-4">
+          {{ form.brands_seen.4 }}{{ form.brands_seen.4.label }}
+        </div>
+        <div class="col-4">
+          {{ form.brands_seen.5 }}{{ form.brands_seen.5.label }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-4">
+          {{ form.brands_seen.6 }}{{ form.brands_seen.6.label }}
+        </div>
+        <div class="col-4">
+          {{ form.brands_seen.7 }}{{ form.brands_seen.7.label }}
+        </div>
+        <div class="col-4">
+          {{ form.brands_seen.8 }}{{ form.brands_seen.8.label }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-4">
+          {{ form.brands_seen.9 }}{{ form.brands_seen.9.label }}
+        </div>
+        <div class="col-4">
+          {{ form.brands_seen.10 }}{{ form.brands_seen.10.label }}
+        </div>
+        <div class="col-4">
+          {{ form.brands_seen.11 }}{{ form.brands_seen.11.label }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-4">
+          {{ form.brands_seen.12 }}{{ form.brands_seen.12.label }}
+        </div>
+        <div class="col-4">
+          {{ form.brands_seen.13 }}{{ form.brands_seen.13.label }}
+        </div>
+        <div class="col-4">
+          {{ form.brands_seen.14 }}{{ form.brands_seen.14.label }}
+        </div>
+      </div>
+    </div> {% for error in form.seen_brands.errors %}  <div class="alert alert-danger" role="alert">{{ error }}</div> {% endfor %}
+  </div> 
+  <div class="form-group">
+    <h3>{{ form.prod_used.label }}</h3></span>
+    <div class="form-options">
+      <div class="row">
+        <div class="col-4">
+          {{ form.prod_used.0 }}{{ form.prod_used.0.label }}
+        </div>
+        <div class="col-4">
+          {{ form.prod_used.1 }}{{ form.prod_used.1.label }}
+        </div>
+        <div class="col-4">
+          {{ form.prod_used.2 }}{{ form.prod_used.2.label }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-4">
+          {{ form.prod_used.3 }}{{ form.prod_used.3.label }}
+        </div>
+        <div class="col-4">
+          {{ form.prod_used.4 }}{{ form.prod_used.4.label }}
+        </div>
+        <div class="col-4">
+          {{ form.prod_used.5 }}{{ form.prod_used.5.label }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-4">
+          {{ form.prod_used.6 }}{{ form.prod_used.6.label }}
+        </div>
+        <div class="col-4">
+          {{ form.prod_used.7 }}{{ form.prod_used.7.label }}
+        </div>
+        <div class="col-4">
+          {{ form.prod_used.8 }}{{ form.prod_used.8.label }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-4">
+          {{ form.prod_used.9 }}{{ form.prod_used.9.label }}
+        </div>
+        <div class="col-4">
+          {{ form.prod_used.10 }}{{ form.prod_used.10.label }}
+        </div>
+        <div class="col-4">
+          {{ form.prod_used.11 }}{{ form.prod_used.11.label }}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-4">
+          {{ form.prod_used.12 }}{{ form.prod_used.12.label }}
+        </div>
+        <div class="col-4">
+          {{ form.prod_used.13 }}{{ form.prod_used.13.label }}
+        </div>
+        <div class="col-4">
+          {{ form.prod_used.14 }}{{ form.prod_used.14.label }}
+        </div>
+      </div>
+    </div> {% for error in form.prod_used.errors %}  <div class="alert alert-danger" role="alert">{{ error }}</div> {% endfor %}
+  </div>
+  <div class="form-group" style="margin-top: 2em; margin-bottom: 2em;">
+    <h3>{{ form.ad_block.label }}</h3></span>
+    {{ form.ad_block }}
+  </div> {% for error in form.ad_block.errors %}  <div class="alert alert-danger" role="alert">{{ error }}</div> {% endfor %} <div class="form-group" style="margin-top: 2em; margin-bottom: 2em;">
+    <h3>{{ form.youtube_sub.label }}</h3></span>
+    {{ form.youtube_sub }}
+  </div> {% for error in form.youtube_sub.errors %}  <div class="alert alert-danger" role="alert">{{ error }}</div> {% endfor %} <div class="form-group">
+    <h3>{{ form.youtube_mobile.label }}</h3></span>
+    <div class="form-options">
+      {{ form.youtube_mobile }}
+    </div> {% for error in form.youtube_mobile.errors %}  <div class="alert alert-danger" role="alert">{{ error }}</div> {% endfor %}
+  </div>
+  <div class="form-group">
+    <h3>{{ form.apprise.label }}</h3></span>
+    <div class="form-options">
+      {{ form.apprise }}
+    </div> {% for error in form.apprise.errors %}  <div class="alert alert-danger" role="alert">{{ error }}</div> {% endfor %}
+  </div>
+  <button class="btn btn-primary" type="submit" class="btn btn-primary">Submit</button>
+</form>
+{% endblock %}
