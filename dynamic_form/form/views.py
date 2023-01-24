@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
-from .model import Experience, UserStage
+from .model import Experience, UserStage, Video
 from .survey import SurveyQA
 
 WAIT_TIME = datetime.timedelta(seconds=10)
@@ -31,7 +31,7 @@ def home_view(request):
             message = "Please watch the videos to continue."
             link = "/experience"
             link_text = "Videos"
-        elif stage.stage == 16:
+        elif stage.stage == 18:
             time_elapsed = timezone.now() - stage.last_updated
             time_remaining = (WAIT_TIME - time_elapsed).total_seconds()
             if time_remaining > 0:
@@ -53,15 +53,15 @@ def home_view(request):
             else:
                 stage.update()
                 return redirect("/")
-        elif stage.stage == 17:
+        elif stage.stage == 19:
             message = "Please answer the questions to continue."
             link = "/survey"
             link_text = "survey"
-        elif stage.stage >= 18 and stage.stage < 38:
+        elif stage.stage >= 20 and stage.stage < 40:
             return redirect("/experience")
-        elif stage.stage >= 38:
+        elif stage.stage >= 40:
             brands = SurveyQA.objects.get(user=user).brand_recog.all()
-            if stage.stage - 38 >= len(brands):
+            if stage.stage - 40 >= len(brands):
                 message = "Thank you for your participation!"
                 link = "/accounts/logout"
                 link_text = "Logout"
@@ -92,14 +92,24 @@ def experience_view(request):
     ]
     video_stages = [3, 4, 5, 7, 8, 9, 11, 12, 13, 14]
     popup_stages = [6, 10, 15]
-    scene_stages = list(range(18, 38))
+    scene_stages = list(range(20, 40))
+    extra_video, consistency_check = 16, 18
 
     if stage in video_stages:
         video = videos[video_stages.index(stage)]
-        return redirect(f"/video/{video.id}/{gaze}")
+        return redirect(f"/video/{video.id}/{gaze}?extra=False")
     elif stage in popup_stages:
         start, end = STAGE_SLICES[popup_stages.index(stage)]
         return redirect(f"/popup/{start},{end}")
+    elif stage == extra_video:
+        uid = request.user.id
+        if uid % 2 == 0:
+            video_id = Video.objects.exclude(id__in=Experience.objects.get(user=request.user).videos.all()).order_by('?')[0].id
+        else:
+            video_id = Experience.objects.get(user=request.user).videos.all()[uid].id
+        return redirect(f"/video/{video_id}/0?extra=True")
+    elif stage == consistency_check:
+        return redirect(f"/consistency_check")
     elif stage < scene_stages[0]:
         return redirect(f"/")
     elif stage in scene_stages:

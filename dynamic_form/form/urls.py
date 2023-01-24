@@ -7,7 +7,7 @@ from .intro import IntroView
 from .popup import popup_slice
 from .scene_qa import SceneQAView
 from .survey import SurveyFormView
-from .video import video_view
+from .video import video_view, consistency_view
 from .views import experience_view, home_view
 
 urlpatterns = [
@@ -20,4 +20,5 @@ urlpatterns = [
     path("scene/<int:scene_id>", SceneQAView, name="scene"),
     path("survey", SurveyFormView, name="survey"),
     path("calib", CalibrateView, name="calibration"),
+    path("consistency_check", consistency_view, name="consistency_check"),
 ]

@@ -151,10 +151,12 @@ class GazeForm(forms.ModelForm):
 def video_view(request, video_id, gaze):
     video = Video.objects.get(id=video_id)
     src, length = video.src, video.length
-    if length > MIN_TIMER:
-        timer = random.randint(MIN_TIMER, max(MIN_TIMER + 1, length - 5000))
+    
+    if length < MIN_TIMER:
+        timer = 100*1000
     else:
-        timer = 60000
+        timer = random.randint(MIN_TIMER, max(MIN_TIMER + 1, length - 5000))
+        
     progress = UserStage.objects.get(user=request.user).stage - 3
 
     if request.method == "POST":
@@ -166,6 +168,10 @@ def video_view(request, video_id, gaze):
             return redirect("/experience")
 
     else:
+        if request.GET.get("extra", False):
+            timer = 100*1000
+            gaze = 0
+
         attn_form, gaze_form = AttentionCheckField(), GazeForm(
             initial={"user": request.user.id, "video": video.id}
         )
@@ -182,3 +188,42 @@ def video_view(request, video_id, gaze):
                 "progress": progress,
             },
         )
+
+class ConsistencyModel(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    watched = models.BooleanField()
+    submit_duration = models.IntegerField(default=0)
+
+    def __str__(self):
+        return f"{self.user} - {self.watched}"
+
+class ConsistencyForm(forms.ModelForm):
+    watched = forms.BooleanField(
+        label="Did you watch the video in this experiment?",
+        required=True,
+        widget=forms.RadioSelect(
+            choices=[(True, "Yes"), (False, "No")],
+        ),
+    )
+    
+    class Meta:
+        model = ConsistencyModel
+        fields = ["user", "watched", "submit_duration"]
+        widgets = {
+            "user": forms.HiddenInput(),
+            "submit_duration": forms.HiddenInput(),
+        }
+
+@login_required
+def consistency_view(request):
+    if request.method == "POST":
+        form = ConsistencyForm(request.POST)
+        if form.is_valid():
+            form.save()
+            user_stage = UserStage.objects.get(user=request.user)
+            user_stage.update()
+            return redirect("/experience")
+
+    else:
+        form = ConsistencyForm(initial={"user": request.user.id})
+        return render(request, "form/popup.html", {"form": form})

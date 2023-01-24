@@ -105,6 +105,24 @@ def random_scene(video):
 
 
 if __name__ == "__main__":
+    with open("data_new/brands.tsv") as f:
+        reader = csv.reader(f, delimiter="\t")
+        for row in tqdm(reader, total=276):
+            name, id = row
+            create_update_brand(name, id)
+
+    with open("data_new/videos.tsv") as f:
+        reader = csv.reader(f, delimiter="\t")
+        for row in tqdm(reader, total=2213):
+            id, name, brand_id, src, length = row
+            create_update_video(id, name, brand_id, src, length)
+
+    with open("data_new/scenes.tsv") as f:
+        reader = csv.reader(f, delimiter="\t")
+        for row in tqdm(reader, total=8658):
+            id, video_id, url = row
+            create_update_video_scene(id, video_id, url)
+
     with open("data_new/users_.tsv") as f:
         reader = csv.reader(f, delimiter="\t")
         for (
@@ -117,14 +135,16 @@ if __name__ == "__main__":
             brand_used_option_ids,
             brand_recog_ids,
             eyetracker,
-            roll_no,
+            roll,
         ) in tqdm(reader, total=635):
             if int(id) > USER_LIMIT:
                 logging.log(logging.INFO, "User limit reached. Breaking.")
                 break
+
             if password == 0:
                 continue
-            user, stage = create_update_get_user_stage(id, username, name, password)
+
+            user, stage = create_update_get_user_stage(id, username, name, roll)
             video_ids = video_ids.split(",")
             brand_seen_option_ids = brand_seen_option_ids.split(",")
             brand_used_option_ids = brand_used_option_ids.split(",")
