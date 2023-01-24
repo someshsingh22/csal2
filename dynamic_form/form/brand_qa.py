@@ -16,6 +16,7 @@ class BrandQA(models.Model):
     audio_types = models.CharField(max_length=100)
     prod_usage = models.IntegerField()
     used_before = models.BooleanField()
+    submit_duration = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.brand.name} - Questionnaire"
@@ -64,10 +65,12 @@ class BrandQAForm(forms.ModelForm):
             "prod_usage",
             "used_before",
             "scene_description",
+            "submit_duration",
         ]
         widgets = {
             "user": forms.HiddenInput(),
             "brand": forms.HiddenInput(),
+            "submit_duration": forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):

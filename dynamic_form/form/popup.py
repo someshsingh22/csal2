@@ -27,6 +27,7 @@ class Popup(models.Model):
     seen_brand_before = models.BooleanField()
     heard_before = models.BooleanField()
     clear_product = models.BooleanField()
+    submit_duration = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.user.username} - {self.video.name}"
@@ -56,6 +57,9 @@ class PopupSliceForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         required=False,
         label="For the previously seen ad(s) Check if the product being advertised is clear",
+    )
+    submit_duration = forms.IntegerField(
+        widget=forms.HiddenInput(), initial=0, required=False
     )
 
     def __init__(self, videos, *args, **kwargs):

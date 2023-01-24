@@ -31,7 +31,7 @@ QUESTIONS = [
     "How many oceans are there in the world?",
     "What is the closest expected average age of your undergrad class?",
     "What is the closest expected average lifetime of an Indian?",
-    "What is the closest Indian Rupees to United States Dollar Exchange rate?"
+    "What is the closest Indian Rupees to United States Dollar Exchange rate?",
     "Which of these is a geographical neighbor of India?",
     "USA stands for United States of India?",
     "CNG stands for Compressed Non-natural Genome?",
@@ -75,12 +75,11 @@ OPTIONS = [
             "80 rupee = 1 dollar",
         ]
     ),
-    (["Pakistan", "USA", "Canada", "London"]),
+    (["Pakistan", "America", "Canada", "London"]),
     (["Agree", "Disagree"]),
     (["Agree", "Disagree"]),
     (["Agree", "Disagree"]),
     (["Agree", "Disagree"]),
-    (["True", "False", "Can’t say"]),
     (["True", "False", "Can’t say"]),
     (["2 hours", "24 hours", "244 hours", "2000 hours"]),
     (["100%", "10%", "40%", "33%"]),

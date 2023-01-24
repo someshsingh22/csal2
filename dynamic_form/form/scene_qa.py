@@ -11,6 +11,7 @@ class SceneQA(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     scene = models.ForeignKey(VideoScene, on_delete=models.CASCADE)
     seen = models.BooleanField(default=False)
+    submit_duration = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.brand.name} - QA"
@@ -25,10 +26,11 @@ class ScenesQAForm(forms.ModelForm):
 
     class Meta:
         model = SceneQA
-        fields = ["user", "scene", "seen"]
+        fields = ["user", "scene", "seen", "submit_duration"]
         widgets = {
             "user": forms.HiddenInput(),
             "scene": forms.HiddenInput(),
+            "submit_duration": forms.HiddenInput(),
         }
 
 

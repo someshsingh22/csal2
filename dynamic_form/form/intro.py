@@ -95,6 +95,8 @@ def IntroView(request):
             stage.stage = max(2, stage.stage)
             stage.save()
             return redirect("/")
+        else:
+            print(form.errors)
     else:
         if stage.stage > 1:
             return redirect("/")

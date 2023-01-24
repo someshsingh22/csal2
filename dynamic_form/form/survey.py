@@ -10,6 +10,7 @@ from .model import Brand, Experience, UserStage, VideoScene
 class SurveyQA(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     brand_recog = models.ManyToManyField(Brand, related_name="brand_options")
+    submit_duration = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.user.username} Survey"
@@ -18,10 +19,11 @@ class SurveyQA(models.Model):
 class SurveyQAForm(forms.ModelForm):
     class Meta:
         model = SurveyQA
-        fields = ["user", "brand_recog"]
+        fields = ["user", "brand_recog", "submit_duration"]
         widgets = {
             "user": forms.HiddenInput(),
             "brand_recog": forms.CheckboxSelectMultiple(),
+            "submit_duration": forms.HiddenInput(),
         }
 
     def __init__(self, *args, **kwargs):
