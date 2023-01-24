@@ -1,3 +1,4 @@
-pytube
+django
 django-import-export
 django-multiselectfield
+tqdm
