@@ -37,19 +37,19 @@ class PopupSliceForm(forms.Form):
         choices=[],
         widget=forms.CheckboxSelectMultiple,
         required=False,
-        label="Which of the previously seen ads have you ever seen prior to the study?",
+        label="Have you seen these exact ads before?",
     )
     seen_brand_before = forms.MultipleChoiceField(
         choices=[],
         widget=forms.CheckboxSelectMultiple,
         required=False,
-        label="Which of the previously seen brand's advertisements have you seen prior to this experiment?",
+        label="Have you seen any ads from these brands before?",
     )
     heard_before = forms.MultipleChoiceField(
         choices=[],
         widget=forms.CheckboxSelectMultiple,
         required=False,
-        label="Which of the previously seen brands have you ever heard of prior to this experiment?",
+        label="Have you heard of these brands prior to this study?",
     )
     clear_product = forms.MultipleChoiceField(
         choices=[],

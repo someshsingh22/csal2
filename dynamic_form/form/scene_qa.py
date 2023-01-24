@@ -17,15 +17,19 @@ class SceneQA(models.Model):
 
 
 class ScenesQAForm(forms.ModelForm):
+    seen = forms.ChoiceField(
+        choices=((False, "No"), (True, "Yes")),
+        widget=forms.RadioSelect,
+        label="Have you seen this scene before?",
+    )
+
     class Meta:
         model = SceneQA
         fields = ["user", "scene", "seen"]
         widgets = {
             "user": forms.HiddenInput(),
             "scene": forms.HiddenInput(),
-            "seen": forms.RadioSelect(choices=[(True, "Yes"), (False, "No")]),
         }
-        label = {"seen": "Have you seen this scene before?"}
 
 
 @login_required
@@ -40,7 +44,7 @@ def SceneQAView(request, scene_id):
             return redirect("/experience")
     else:
         form = ScenesQAForm(initial={"user": request.user, "scene": scene})
-        progress = int(100 * SceneQA.objects.filter(user=request.user).count() / 20)
+        progress = SceneQA.objects.filter(user=request.user).count()
         return render(
             request,
             "form/scene_qa.html",

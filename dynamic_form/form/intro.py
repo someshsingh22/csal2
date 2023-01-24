@@ -30,6 +30,7 @@ class Introduction(models.Model):
         max_choices=7,
         max_length=100,
     )
+    submit_duration = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.user.username}_Introduction"
@@ -67,9 +68,11 @@ class IntroductionForm(forms.ModelForm):
             "youtube_sub",
             "youtube_mobile",
             "apprise",
+            "submit_duration",
         ]
         widgets = {
             "experience": forms.HiddenInput(),
+            "submit_duration": forms.HiddenInput(),
             "brands_seen": forms.CheckboxSelectMultiple(),
             "prod_used": forms.CheckboxSelectMultiple(),
             "apprise": forms.CheckboxSelectMultiple(),

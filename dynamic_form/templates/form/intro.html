@@ -146,4 +146,15 @@
   </div>
   <button class="btn btn-primary" type="submit" class="btn btn-primary">Submit</button>
 </form>
+<script>
+  var start_time = new Date().getTime();
+  var time_diff = 0;
+  var form = document.querySelector('form');
+  var submit_duration = document.querySelector('#id_submit_duration');
+  form.addEventListener('submit', function() {
+    var end_time = new Date().getTime();
+    time_diff = (end_time - start_time) / 1000;
+    submit_duration.value = time_diff;
+  });
+</script>
 {% endblock %}

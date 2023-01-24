@@ -14,40 +14,51 @@ TO_BE_REGISTERED = [
     "User",
 ]
 
+
 class BrandResource(resources.ModelResource):
     class Meta:
         model = Brand
+
 
 class ExperienceResource(resources.ModelResource):
     class Meta:
         model = Experience
 
+
 class VideoResource(resources.ModelResource):
     class Meta:
         model = Video
+
 
 class VideoSceneResource(resources.ModelResource):
     class Meta:
         model = VideoScene
 
+
 class UserStageResource(resources.ModelResource):
     class Meta:
         model = UserStage
 
+
 class BrandAdmin(ImportExportModelAdmin):
     resource_class = BrandResource
+
 
 class ExperienceAdmin(ImportExportModelAdmin):
     resource_class = ExperienceResource
 
+
 class VideoAdmin(ImportExportModelAdmin):
     resource_class = VideoResource
+
 
 class VideoSceneAdmin(ImportExportModelAdmin):
     resource_class = VideoSceneResource
 
+
 class UserStageAdmin(ImportExportModelAdmin):
     resource_class = UserStageResource
+
 
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(Experience, ExperienceAdmin)
