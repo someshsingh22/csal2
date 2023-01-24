@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
+<script>
+    var sub_text = document.querySelector("a[class=navbar-brand]")
+    sub_text.innerHTML += "<span style='color:green;'>\t|\tForm {{ progress }} / {{ total }}<span>"
+</script>
 <form method="post">
     <h2>{{ brand }}</h2>
     {% csrf_token %}

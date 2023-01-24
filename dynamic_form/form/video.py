@@ -8,7 +8,7 @@ from django.shortcuts import redirect, render
 
 from .model import Experience, UserStage, Video
 
-MIN_TIMER = 20000
+MIN_TIMER = 15000
 TIME_LIMIT = 15
 
 QUESTIONS = [
@@ -153,11 +153,11 @@ def video_view(request, video_id, gaze):
     src, length = video.src, video.length
     
     if length < MIN_TIMER:
-        timer = 100*1000
+        timer = 1000*1000
     else:
         timer = random.randint(MIN_TIMER, max(MIN_TIMER + 1, length - 5000))
         
-    progress = UserStage.objects.get(user=request.user).stage - 3
+    progress = GazeModel.objects.filter(user=request.user).count() + 1
 
     if request.method == "POST":
         form = GazeForm(request.POST)
@@ -168,10 +168,10 @@ def video_view(request, video_id, gaze):
             return redirect("/experience")
 
     else:
-        if request.GET.get("extra", False):
-            timer = 100*1000
+        if request.GET.get("extra") == "True":
+            timer = 1000*1000
             gaze = 0
-
+        
         attn_form, gaze_form = AttentionCheckField(), GazeForm(
             initial={"user": request.user.id, "video": video.id}
         )

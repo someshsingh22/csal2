@@ -93,7 +93,7 @@ def experience_view(request):
     video_stages = [3, 4, 5, 7, 8, 9, 11, 12, 13, 14]
     popup_stages = [6, 10, 15]
     scene_stages = list(range(20, 40))
-    extra_video, consistency_check = 16, 18
+    extra_video, consistency_check = 16, 17
 
     if stage in video_stages:
         video = videos[video_stages.index(stage)]

@@ -5,8 +5,10 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import models
 from django.shortcuts import redirect, render
+from multiselectfield import MultiSelectField
 
 from .model import Brand, UserStage
+from .survey import SurveyQA
 
 
 class BrandQA(models.Model):
@@ -17,6 +19,11 @@ class BrandQA(models.Model):
     prod_usage = models.IntegerField()
     used_before = models.BooleanField()
     submit_duration = models.IntegerField(default=0)
+    scene_options = MultiSelectField(
+        choices=[(0, "SD1"), (1, "SD2"), (2, "SD3"), (3, "SD4"), (4, "SD5")],
+        max_choices=5,
+        max_length=1000,
+    )
 
     def __str__(self):
         return f"{self.brand.name} - Questionnaire"
@@ -32,7 +39,7 @@ class BrandQAForm(forms.ModelForm):
             ("dont_remember", "Don't Remember"),
         ],
         widget=forms.RadioSelect,
-        label="For the {brand} ad, I remember hearing the following audio types:",
+        label="For the {brand} ad(s), I remember hearing the following audio types:",
     )
     prod_usage = forms.ChoiceField(
         choices=[
@@ -41,7 +48,7 @@ class BrandQAForm(forms.ModelForm):
             (2, "10+"),
         ],
         widget=forms.RadioSelect,
-        label="How many times in the last 1 year have you used the product shown in the {brand} ad?",
+        label="How many times in the last 1 year have you used the product shown in the {brand} ad(s)?",
     )
     used_before = forms.ChoiceField(
         choices=[
@@ -53,7 +60,7 @@ class BrandQAForm(forms.ModelForm):
     )
     scene_description = forms.CharField(
         widget=forms.Textarea(attrs={"rows": 3}),
-        label="For the {brand} ad, I remember seeing the following (Write Scene Descriptions, feel free to write any scenes, music,characters,emotions,objects you remember seeing)",
+        label="For the {brand} ad(s), I remember seeing the following (Write Scene Descriptions, feel free to write any scenes, music,characters,emotions,objects you remember seeing)",
     )
 
     class Meta:
@@ -61,16 +68,21 @@ class BrandQAForm(forms.ModelForm):
         fields = [
             "user",
             "brand",
+            "scene_description",
             "audio_types",
             "prod_usage",
             "used_before",
-            "scene_description",
             "submit_duration",
+            "scene_options"
         ]
         widgets = {
             "user": forms.HiddenInput(),
             "brand": forms.HiddenInput(),
             "submit_duration": forms.HiddenInput(),
+            "scene_options": forms.CheckboxSelectMultiple(),
+        }
+        labels = {
+            "scene_options": "For the {brand} ad(s), Which of the following scenes do you remember seeing (Select all that apply)?",
         }
 
     def __init__(self, *args, **kwargs):
@@ -91,12 +103,24 @@ class BrandQAForm(forms.ModelForm):
         self.fields["scene_description"].label = self.fields[
             "scene_description"
         ].label.format(brand=brand.name)
+        self.fields["scene_options"].choices = [
+            (0, "Scene Description 1"),
+            (1, "Scene Description 2"),
+            (2, "Scene Description 3"),
+            (3, "Scene Description 4"),
+            (4, "Scene Description 5"),
+        ]
+        self.fields["scene_options"].label = self.fields["scene_options"].label.format(
+            brand=brand.name
+        )
 
 
 @login_required
 def BrandQAView(request, brand_id):
     brand = Brand.objects.get(id=brand_id)
     userstage = UserStage.objects.get(user=request.user)
+    total = SurveyQA.objects.get(user=request.user).brand_recog.count()
+    progress = BrandQA.objects.filter(user=request.user).count() + 1
     if request.method == "POST":
         form = BrandQAForm(request.POST, user=request.user, brand=brand)
         if form.is_valid():
@@ -105,4 +129,4 @@ def BrandQAView(request, brand_id):
             return redirect("/experience")
     else:
         form = BrandQAForm(user=request.user, brand=brand)
-    return render(request, "form/brand_qa.html", {"form": form, "brand": brand})
+    return render(request, "form/brand_qa.html", {"form": form, "brand": brand, "progress": progress, "total": total})
