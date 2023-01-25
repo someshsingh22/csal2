@@ -36,6 +36,7 @@ class Video(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
     src = models.CharField(max_length=100)
     length = models.IntegerField()
+    desc = models.CharField(max_length=600)
 
     def __str__(self):
         return self.name

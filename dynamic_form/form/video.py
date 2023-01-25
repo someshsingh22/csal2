@@ -151,12 +151,12 @@ class GazeForm(forms.ModelForm):
 def video_view(request, video_id, gaze):
     video = Video.objects.get(id=video_id)
     src, length = video.src, video.length
-    
+
     if length < MIN_TIMER:
-        timer = 1000*1000
+        timer = 1000 * 1000
     else:
         timer = random.randint(MIN_TIMER, max(MIN_TIMER + 1, length - 5000))
-        
+
     progress = GazeModel.objects.filter(user=request.user).count() + 1
 
     if request.method == "POST":
@@ -169,9 +169,9 @@ def video_view(request, video_id, gaze):
 
     else:
         if request.GET.get("extra") == "True":
-            timer = 1000*1000
+            timer = 1000 * 1000
             gaze = 0
-        
+
         attn_form, gaze_form = AttentionCheckField(), GazeForm(
             initial={"user": request.user.id, "video": video.id}
         )
@@ -189,6 +189,7 @@ def video_view(request, video_id, gaze):
             },
         )
 
+
 class ConsistencyModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     watched = models.BooleanField()
@@ -196,6 +197,7 @@ class ConsistencyModel(models.Model):
 
     def __str__(self):
         return f"{self.user} - {self.watched}"
+
 
 class ConsistencyForm(forms.ModelForm):
     watched = forms.BooleanField(
@@ -205,7 +207,7 @@ class ConsistencyForm(forms.ModelForm):
             choices=[(True, "Yes"), (False, "No")],
         ),
     )
-    
+
     class Meta:
         model = ConsistencyModel
         fields = ["user", "watched", "submit_duration"]
@@ -213,6 +215,7 @@ class ConsistencyForm(forms.ModelForm):
             "user": forms.HiddenInput(),
             "submit_duration": forms.HiddenInput(),
         }
+
 
 @login_required
 def consistency_view(request):

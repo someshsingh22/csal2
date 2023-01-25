@@ -104,7 +104,13 @@ def experience_view(request):
     elif stage == extra_video:
         uid = request.user.id
         if uid % 2 == 0:
-            video_id = Video.objects.exclude(id__in=Experience.objects.get(user=request.user).videos.all()).order_by('?')[0].id
+            video_id = (
+                Video.objects.exclude(
+                    id__in=Experience.objects.get(user=request.user).videos.all()
+                )
+                .order_by("?")[0]
+                .id
+            )
         else:
             video_id = Experience.objects.get(user=request.user).videos.all()[uid].id
         return redirect(f"/video/{video_id}/0?extra=True")

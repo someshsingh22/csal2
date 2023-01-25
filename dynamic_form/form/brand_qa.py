@@ -7,7 +7,7 @@ from django.db import models
 from django.shortcuts import redirect, render
 from multiselectfield import MultiSelectField
 
-from .model import Brand, UserStage
+from .model import Brand, Experience, UserStage, Video
 from .survey import SurveyQA
 
 
@@ -19,11 +19,12 @@ class BrandQA(models.Model):
     prod_usage = models.IntegerField()
     used_before = models.BooleanField()
     submit_duration = models.IntegerField(default=0)
-    scene_options = MultiSelectField(
+    scene_options_out = MultiSelectField(
         choices=[(0, "SD1"), (1, "SD2"), (2, "SD3"), (3, "SD4"), (4, "SD5")],
         max_choices=5,
         max_length=1000,
     )
+    scene_options_in = models.CharField(max_length=1000, default="")
 
     def __str__(self):
         return f"{self.brand.name} - Questionnaire"
@@ -73,16 +74,18 @@ class BrandQAForm(forms.ModelForm):
             "prod_usage",
             "used_before",
             "submit_duration",
-            "scene_options"
+            "scene_options_out",
+            "scene_options_in",
         ]
         widgets = {
             "user": forms.HiddenInput(),
             "brand": forms.HiddenInput(),
             "submit_duration": forms.HiddenInput(),
-            "scene_options": forms.CheckboxSelectMultiple(),
+            "scene_options_out": forms.CheckboxSelectMultiple(),
+            "scene_options_in": forms.HiddenInput(),
         }
         labels = {
-            "scene_options": "For the {brand} ad(s), Which of the following scenes do you remember seeing (Select all that apply)?",
+            "scene_options_out": "For the {brand} ad(s), Which of the following scenes do you remember seeing (Select all that apply)?",
         }
 
     def __init__(self, *args, **kwargs):
@@ -103,30 +106,41 @@ class BrandQAForm(forms.ModelForm):
         self.fields["scene_description"].label = self.fields[
             "scene_description"
         ].label.format(brand=brand.name)
-        self.fields["scene_options"].choices = [
-            (0, "Scene Description 1"),
-            (1, "Scene Description 2"),
-            (2, "Scene Description 3"),
-            (3, "Scene Description 4"),
-            (4, "Scene Description 5"),
-        ]
-        self.fields["scene_options"].label = self.fields["scene_options"].label.format(
-            brand=brand.name
-        )
+        self.fields["scene_options_out"].label = self.fields[
+            "scene_options_out"
+        ].label.format(brand=brand.name)
 
 
 @login_required
 def BrandQAView(request, brand_id):
     brand = Brand.objects.get(id=brand_id)
-    userstage = UserStage.objects.get(user=request.user)
-    total = SurveyQA.objects.get(user=request.user).brand_recog.count()
-    progress = BrandQA.objects.filter(user=request.user).count() + 1
+    user = request.user
+    exp = Experience.objects.get(user=user)
+    in_videos = list(Video.objects.filter(id__in=exp.videos.all(), brand=brand))
+    out_videos = list(Video.objects.exclude(id__in=exp.videos.all(), brand=brand))
+    out_videos = random.sample(list(out_videos), 5 - len(in_videos))
+    videos = in_videos + out_videos
+    random.shuffle(videos)
+    descriptions = [v.desc in in_videos for v in videos]
+
+    userstage = UserStage.objects.get(user=user)
+    total = SurveyQA.objects.get(user=user).brand_recog.count()
+    progress = BrandQA.objects.filter(user=user).count() + 1
     if request.method == "POST":
-        form = BrandQAForm(request.POST, user=request.user, brand=brand)
+        form = BrandQAForm(request.POST, user=user, brand=brand)
         if form.is_valid():
             form.save()
             userstage.update()
             return redirect("/experience")
     else:
-        form = BrandQAForm(user=request.user, brand=brand)
-    return render(request, "form/brand_qa.html", {"form": form, "brand": brand, "progress": progress, "total": total})
+        form = BrandQAForm(user=user, brand=brand)
+        form.fields["scene_options_out"].choices = [
+            (i, descriptions[i]) for i in range(len(descriptions))
+        ]
+        form.fields["scene_options_in"].initial = ",".join([str(v.id) for v in videos])
+
+    return render(
+        request,
+        "form/brand_qa.html",
+        {"form": form, "brand": brand, "progress": progress, "total": total},
+    )

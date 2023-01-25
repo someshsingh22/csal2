@@ -124,4 +124,8 @@ def popup_slice(request, start, end):
                 popup.save()
             user_stage.update()
             return redirect("/experience")
-    return render(request, "form/popup.html", {"form": form, "progress": [6, 10, 15].index(user_stage.stage) + 1})
+    return render(
+        request,
+        "form/popup.html",
+        {"form": form, "progress": [6, 10, 15].index(user_stage.stage) + 1},
+    )

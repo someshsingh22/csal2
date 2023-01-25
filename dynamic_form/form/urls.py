@@ -7,7 +7,7 @@ from .intro import IntroView
 from .popup import popup_slice
 from .scene_qa import SceneQAView
 from .survey import SurveyFormView
-from .video import video_view, consistency_view
+from .video import consistency_view, video_view
 from .views import experience_view, home_view
 
 urlpatterns = [
