@@ -138,12 +138,12 @@ if __name__ == "__main__":
             brand_recog_ids,
             eyetracker,
             roll,
-        ) in tqdm(reader, total=635):
+        ) in tqdm(reader, total=621):
             if int(id) > USER_LIMIT:
                 logging.log(logging.INFO, "User limit reached. Breaking.")
                 break
 
-            if password == 0:
+            if password == "0":
                 continue
 
             user, stage = create_update_get_user_stage(id, username, name, roll)
