@@ -1,6 +1,2 @@
-dynamic_form/db.sqlite3
-**staticfiles**
-**.pyc
 **migrations**
 dynamic_form/dynamic_form/settings.py
-**.log
