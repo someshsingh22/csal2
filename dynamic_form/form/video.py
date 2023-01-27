@@ -229,4 +229,4 @@ def consistency_view(request):
 
     else:
         form = ConsistencyForm(initial={"user": request.user.id})
-        return render(request, "form/popup.html", {"form": form})
+        return render(request, "form/popup.html", {"form": form, "progress": 4})

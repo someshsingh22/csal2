@@ -117,11 +117,22 @@ def BrandQAView(request, brand_id):
     user = request.user
     exp = Experience.objects.get(user=user)
     in_videos = list(Video.objects.filter(id__in=exp.videos.all(), brand=brand))
-    out_videos = list(Video.objects.exclude(id__in=exp.videos.all(), brand=brand))
-    out_videos = random.sample(list(out_videos), 5 - len(in_videos))
-    videos = in_videos + out_videos
+    out_videos = list(
+        Video.objects.exclude(id__in=exp.videos.all()).filter(brand=brand)
+    )
+    if len(out_videos) + len(in_videos) < 5:
+        out_brand_videos = list(
+            Video.objects.exclude(id__in=exp.videos.all()).exclude(brand=brand)
+        )
+        videos = (
+            in_videos
+            + out_videos
+            + random.sample(out_brand_videos, 5 - len(in_videos) - len(out_videos))
+        )
+    else:
+        videos = in_videos + random.sample(out_videos, 5 - len(in_videos))
     random.shuffle(videos)
-    descriptions = [v.desc in in_videos for v in videos]
+    descriptions = [v.desc for v in videos]
 
     userstage = UserStage.objects.get(user=user)
     total = SurveyQA.objects.get(user=user).brand_recog.count()

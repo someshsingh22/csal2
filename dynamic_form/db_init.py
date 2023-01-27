@@ -102,10 +102,6 @@ def create_update_video_scene(id, video_id, url):
     video_scene.save()
 
 
-def random_scene(video):
-    return VideoScene.objects.filter(video=video).order_by("?").first()
-
-
 if __name__ == "__main__":
     with open("data_new/brands.tsv") as f:
         reader = csv.reader(f, delimiter="\t")
@@ -113,19 +109,19 @@ if __name__ == "__main__":
             name, id = row
             create_update_brand(name, id)
 
-    with open("data_new/videos_.tsv") as f:
+    with open("data_new/videos.tsv") as f:
         reader = csv.reader(f, delimiter="\t")
-        for row in tqdm(reader, total=2213):
+        for row in tqdm(reader, total=2205):
             id, name, brand_id, src, length, desc = row
             create_update_video(id, name, brand_id, src, length, desc)
 
     with open("data_new/scenes.tsv") as f:
         reader = csv.reader(f, delimiter="\t")
-        for row in tqdm(reader, total=8658):
+        for row in tqdm(reader, total=4424):
             id, video_id, url = row
             create_update_video_scene(id, video_id, url)
 
-    with open("data_new/users_.tsv") as f:
+    with open("data_new/exp.tsv") as f:
         reader = csv.reader(f, delimiter="\t")
         for (
             id,
@@ -137,21 +133,20 @@ if __name__ == "__main__":
             brand_used_option_ids,
             brand_recog_ids,
             eyetracker,
-            roll,
-        ) in tqdm(reader, total=621):
+            scene_ids,
+        ) in tqdm(reader, total=620):
             if int(id) > USER_LIMIT:
                 logging.log(logging.INFO, "User limit reached. Breaking.")
                 break
 
-            if password == "0":
-                continue
-
-            user, stage = create_update_get_user_stage(id, username, name, roll)
+            user, stage = create_update_get_user_stage(id, username, name, password)
             video_ids = video_ids.split(",")
             brand_seen_option_ids = brand_seen_option_ids.split(",")
             brand_used_option_ids = brand_used_option_ids.split(",")
             brand_recog_ids = brand_recog_ids.split(",")
-            videos, brand_seen_options, brand_used_options, brand_recogs = (
+            scene_ids = scene_ids.split(",")
+            videos, brand_seen_options, brand_used_options, brand_recogs, scenes = (
+                [],
                 [],
                 [],
                 [],
@@ -181,6 +176,12 @@ if __name__ == "__main__":
                 else:
                     brand_recogs.append(Brand.objects.get(id=brand_id))
 
+            for scene_id in scene_ids:
+                if not VideoScene.objects.filter(id=scene_id).exists():
+                    logging.error(f"Scene {scene_id} does not exist.")
+                else:
+                    scenes.append(VideoScene.objects.get(id=scene_id))
+
             if Experience.objects.filter(user=user).exists():
                 experience = Experience.objects.get(user=user)
                 logging.warning(f"Experience {username} already exists. Updated.")
@@ -189,16 +190,6 @@ if __name__ == "__main__":
                     user=user,
                 )
                 logging.info(f"Experience {username} created.")
-
-            random.seed(id)
-            scenes = []
-            for video in videos:
-                scenes.append(random_scene(video))
-            for scene in (
-                VideoScene.objects.exclude(video__in=videos).order_by("?")[:10].all()
-            ):
-                scenes.append(scene)
-            random.shuffle(scenes)
 
             experience.videos.set(videos)
             experience.brands_seen_options.set(brand_seen_options)
