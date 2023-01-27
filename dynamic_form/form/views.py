@@ -119,7 +119,11 @@ def experience_view(request):
     elif stage < scene_stages[0]:
         return redirect(f"/")
     elif stage in scene_stages:
+        print(stage)
+        print(scene_stages[0])
+        print(len(scenes))
         scene_idx = stage - scene_stages[0]
+        print(scene_idx)
         scene = scenes[scene_idx]
         return redirect(f"/scene/{scene.id}")
     else:

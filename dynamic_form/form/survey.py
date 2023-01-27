@@ -47,6 +47,8 @@ def SurveyFormView(request):
             form.save()
             stage.update()
             return redirect("/experience")
+        else:
+            return render(request, "form/survey.html", {"form": form})
     else:
         form = SurveyQAForm(user=request.user)
     return render(request, "form/survey.html", {"form": form})

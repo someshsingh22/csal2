@@ -200,20 +200,16 @@ class ConsistencyModel(models.Model):
 
 
 class ConsistencyForm(forms.ModelForm):
-    watched = forms.BooleanField(
-        label="Did you watch the video in this experiment?",
-        required=True,
-        widget=forms.RadioSelect(
-            choices=[(True, "Yes"), (False, "No")],
-        ),
-    )
-
     class Meta:
         model = ConsistencyModel
-        fields = ["user", "watched", "submit_duration"]
+        fields = ["user", "submit_duration", "watched"]
         widgets = {
             "user": forms.HiddenInput(),
             "submit_duration": forms.HiddenInput(),
+            "watched": forms.RadioSelect(),
+        }
+        labels = {
+            "watched": "Did you watch this video in this assignment?",
         }
 
 
@@ -226,6 +222,10 @@ def consistency_view(request):
             user_stage = UserStage.objects.get(user=request.user)
             user_stage.update()
             return redirect("/experience")
+        else:
+            print(form.errors)
+            print(form.cleaned_data)
+            return render(request, "form/popup.html", {"form": form, "progress": 4})
 
     else:
         form = ConsistencyForm(initial={"user": request.user.id})

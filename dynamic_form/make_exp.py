@@ -59,5 +59,6 @@ users["brand_2_ids"] = brand_2_ids
 users["brand_op_ids"] = brand_op_ids
 users["eyetracker"] = 0
 users["scene_set_ids"] = scene_set_ids
+users["id"]+=1
 
 users.to_csv("data_new/exp.tsv", sep="\t", index=False, header=False)

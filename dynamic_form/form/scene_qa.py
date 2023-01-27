@@ -44,6 +44,13 @@ def SceneQAView(request, scene_id):
             form.save()
             user_stage.update()
             return redirect("/experience")
+        else:
+            return render(
+                request,
+                "form/scene_qa.html",
+                {"form": form, "scene": scene.url},
+            )
+
     else:
         form = ScenesQAForm(initial={"user": request.user, "scene": scene})
         progress = SceneQA.objects.filter(user=request.user).count()

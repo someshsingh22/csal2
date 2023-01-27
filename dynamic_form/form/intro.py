@@ -97,6 +97,7 @@ def IntroView(request):
             return redirect("/")
         else:
             print(form.errors)
+            return render(request, "form/intro.html", {"form": form})
     else:
         if stage.stage > 1:
             return redirect("/")

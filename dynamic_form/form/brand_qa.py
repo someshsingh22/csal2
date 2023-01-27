@@ -143,6 +143,18 @@ def BrandQAView(request, brand_id):
             form.save()
             userstage.update()
             return redirect("/experience")
+        else:
+            form.fields["scene_options_out"].choices = [
+                (i, descriptions[i]) for i in range(len(descriptions))
+            ]
+            form.fields["scene_options_in"].initial = ",".join(
+                [str(v.id) for v in videos]
+            )
+            return render(
+                request,
+                "form/brand_qa.html",
+                {"form": form, "brand": brand, "progress": progress, "total": total},
+            )
     else:
         form = BrandQAForm(user=user, brand=brand)
         form.fields["scene_options_out"].choices = [
