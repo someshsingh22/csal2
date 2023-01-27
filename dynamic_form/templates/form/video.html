@@ -6,7 +6,7 @@
     var sub_text = document.querySelector("a[class=navbar-brand]")
     sub_text.innerHTML += "<span style='color:green;'>\t|\tVideo {{ progress }} / 11<span>"
 </script>
-<script src="{% static '/js/video.js'%}" ></script>
+
 <div class="box" id="play">
     <video id="video" style="width: 0%;"><source src="{{ src }}" type="video/mp4"></video>
     <h2>Click to play video</h2>
@@ -25,4 +25,7 @@
     {{ gaze_form.as_p }}
     <button class="btn btn-primary" id="record" onclick="end()" type="submit">Next</button>
 </form>
+{% endblock %}
+{% block script %}
+<script src="{% static '/js/video.js'%}" ></script>
 {% endblock %}
