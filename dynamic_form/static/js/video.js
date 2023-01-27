@@ -6,6 +6,7 @@ var gaze_form = document.getElementById("gaze");
 var play_div = document.getElementById("play");
 var gaze_input_x = document.getElementById("gaze_input_x");
 var gaze_input_y = document.getElementById("gaze_input_y");
+var video = document.getElementById("video");
 var x = ""
 var y = ""
 
