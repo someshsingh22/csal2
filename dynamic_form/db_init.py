@@ -89,9 +89,9 @@ def create_update_get_user_stage(id, username, name, password):
 def create_update_video_scene(id, video_id, url):
     if not Video.objects.filter(id=video_id).exists():
         logging.error(
-            f"VideoScene {id} not created. Video {video_id} does not exist. Setting Random video for the time being"
+            f"VideoScene {id} not created. Video {video_id} does not exist."
         )
-        video_id = random.choice(Video.objects.all()).id
+        return
     video = Video.objects.get(id=video_id)
     if VideoScene.objects.filter(id=id).exists():
         video_scene = VideoScene.objects.get(id=id)

@@ -93,7 +93,6 @@ class IntroductionForm(forms.ModelForm):
         return cleaned_data
 
 
-
 @login_required
 def IntroView(request):
     user = request.user

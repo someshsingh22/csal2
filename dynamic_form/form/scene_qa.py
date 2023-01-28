@@ -31,7 +31,7 @@ class ScenesQAForm(forms.ModelForm):
             "user": forms.HiddenInput(),
             "scene": forms.HiddenInput(),
         }
-    
+
     def clean(self):
         cleaned_data = super().clean()
         user = cleaned_data.get("user")

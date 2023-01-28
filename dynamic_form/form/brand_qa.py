@@ -1,13 +1,13 @@
 import random
+from itertools import chain
 
 from django import forms
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import models
 from django.shortcuts import redirect, render
-from multiselectfield import MultiSelectField
-from itertools import chain
 from django.utils.safestring import mark_safe
+from multiselectfield import MultiSelectField
 
 from .model import Brand, Experience, UserStage, Video
 from .survey import SurveyQA
@@ -110,7 +110,6 @@ class BrandQAForm(forms.ModelForm):
             self.add_error(
                 "audio_types", "Please select at least one audio type for the ad(s)"
             )
-        
 
 
 @login_required
@@ -151,10 +150,13 @@ class BrandDescQA(models.Model):
     def __str__(self):
         return f"{self.brand.name} - Description Questionnaire"
 
+
 class SpecialCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
     def render(self, name, value, attrs=None, choices=(), renderer=None):
         output = []
-        for index, (option_value, option_label) in enumerate(chain(self.choices, choices)):
+        for index, (option_value, option_label) in enumerate(
+            chain(self.choices, choices)
+        ):
             if value is None:
                 value = []
             if option_value in value:
@@ -163,7 +165,13 @@ class SpecialCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
                 checked = ""
             output.append(
                 '<label><input type="checkbox" name="%s" value="%s"%s /> <b>%s</b> %s</label>'
-                % (name, option_value, checked, option_label['title'], option_label['description'])
+                % (
+                    name,
+                    option_value,
+                    checked,
+                    option_label["title"],
+                    option_label["description"],
+                )
             )
         return mark_safe("".join(output))
 
@@ -192,9 +200,8 @@ class BrandDecQAForm(forms.ModelForm):
         ].label.format(brand=brand.name)
         exp = Experience.objects.get(user=user)
         in_videos = Video.objects.filter(brand=brand, experience=exp).all()
-        out_videos = (
-            Video.objects.filter(brand=brand)
-            .exclude(id__in=[video.id for video in in_videos])
+        out_videos = Video.objects.filter(brand=brand).exclude(
+            id__in=[video.id for video in in_videos]
         )
         if 5 - len(in_videos) - out_videos.count() > 0:
             out_brand_videos = (
@@ -204,14 +211,16 @@ class BrandDecQAForm(forms.ModelForm):
             )
             videos = list(in_videos) + list(out_videos.all()) + list(out_brand_videos)
         else:
-            videos = list(in_videos) + list(out_videos.order_by("?")[:5 - len(in_videos)])
+            videos = list(in_videos) + list(
+                out_videos.order_by("?")[: 5 - len(in_videos)]
+            )
         random.shuffle(videos)
 
         self.fields["video_description_option_out"].choices = [
             (video.id, {"title": video.title, "description": video.desc})
             for video in videos
         ]
-    
+
     def clean(self):
         cleaned_data = super().clean()
         user = cleaned_data.get("user")
@@ -222,6 +231,7 @@ class BrandDecQAForm(forms.ModelForm):
                 f"You have already completed the questionnaire for {brand.name}",
             )
         return cleaned_data
+
 
 @login_required
 def BrandDescQAView(request, brand_id):

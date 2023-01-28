@@ -41,11 +41,9 @@ class SurveyQAForm(forms.ModelForm):
         cleaned_data = super().clean()
         user = cleaned_data.get("user")
         if SurveyQA.objects.filter(user=user).exists():
-            self.add_error(
-                "user",
-                "You have already submitted the survey."
-            )
+            self.add_error("user", "You have already submitted the survey.")
         return cleaned_data
+
 
 def SurveyFormView(request):
     stage = UserStage.objects.get(user=request.user)

@@ -71,10 +71,13 @@ def home_view(request):
             link = "/experience"
             link_text = "Survey"
         else:
-            brands = list([
-                v.brand for v in Experience.objects.get(user=user).videos.all()
-                if v.brand
-            ])
+            brands = list(
+                [
+                    v.brand
+                    for v in Experience.objects.get(user=user).videos.all()
+                    if v.brand
+                ]
+            )
             unique_brands = []
             for brand in brands:
                 if brand not in unique_brands:
@@ -153,10 +156,9 @@ def experience_view(request):
         scene = scenes[user_stage.stage - 50].id
         return redirect("/scene/" + str(scene))
     elif stage >= 70:
-        brands = list([
-            v.brand for v in Experience.objects.get(user=user).videos.all()
-            if v.brand
-        ])
+        brands = list(
+            [v.brand for v in Experience.objects.get(user=user).videos.all() if v.brand]
+        )
         unique_brands = []
         for brand in brands:
             if brand not in unique_brands:
