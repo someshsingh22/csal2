@@ -90,6 +90,25 @@ class BrandQAForm(forms.ModelForm):
         self.fields["used_before"].label = self.fields["used_before"].label.format(
             brand=brand.name
         )
+        self.fields["scene_description"].label = self.fields[
+            "scene_description"
+        ].label.format(brand=brand.name)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        user = cleaned_data.get("user")
+        brand = cleaned_data.get("brand")
+        if BrandQA.objects.filter(user=user, brand=brand).exists():
+            self.add_error(
+                "user",
+                f"You have already completed the questionnaire for {brand.name}",
+            )
+        audio_types = cleaned_data.get("audio_types")
+        if len(audio_types) == 0:
+            self.add_error(
+                "audio_types", "Please select at least one audio type for the ad(s)"
+            )
+        
 
 
 @login_required
@@ -169,7 +188,17 @@ class BrandDecQAForm(forms.ModelForm):
         random.shuffle(videos)
         options = [(video.id, video.description) for video in videos]
         self.fields["video_description_option_out"].choices = options
-
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        user = cleaned_data.get("user")
+        brand = cleaned_data.get("brand")
+        if BrandDescQA.objects.filter(user=user, brand=brand).exists():
+            self.add_error(
+                "user",
+                f"You have already completed the questionnaire for {brand.name}",
+            )
+        return cleaned_data
 
 @login_required
 def BrandDescQAView(request, brand_id):

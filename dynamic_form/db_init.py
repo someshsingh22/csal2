@@ -35,7 +35,7 @@ def create_update_brand(name, id):
     brand.save()
 
 
-def create_update_video(id, name, brand_id, src, length, desc):
+def create_update_video(id, name, brand_id, src, length, desc, title):
     if Video.objects.filter(id=id).exists():
         video = Video.objects.get(id=id)
         video.name = name
@@ -43,6 +43,7 @@ def create_update_video(id, name, brand_id, src, length, desc):
         video.src = src
         video.length = length
         video.desc = desc
+        video.title = title
         logging.warning(f"Video {name} already exists. Updated.")
     else:
         brand = Brand.objects.get(id=brand_id)
@@ -53,6 +54,7 @@ def create_update_video(id, name, brand_id, src, length, desc):
             src=src,
             length=length,
             desc=desc,
+            title=title,
         )
         logging.info(f"Video {name} created.")
     video.save()
@@ -112,8 +114,8 @@ if __name__ == "__main__":
     with open("data_new/videos.tsv") as f:
         reader = csv.reader(f, delimiter="\t")
         for row in tqdm(reader, total=2205):
-            id, name, brand_id, src, length, desc = row
-            create_update_video(id, name, brand_id, src, length, desc)
+            id, name, brand_id, src, length, desc, title = row
+            create_update_video(id, name, brand_id, src, length, desc, title)
 
     with open("data_new/scenes.tsv") as f:
         reader = csv.reader(f, delimiter="\t")

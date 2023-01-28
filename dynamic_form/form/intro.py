@@ -82,6 +82,17 @@ class IntroductionForm(forms.ModelForm):
             "apprise": "How do you apprise yourself of the latest products and brands? (Multi correct)",
         }
 
+    def clean(self):
+        cleaned_data = super().clean()
+        exp = cleaned_data.get("experience")
+        if Introduction.objects.filter(experience=exp).exists():
+            self.add_error(
+                "experience",
+                "You have already filled this form. Please contact the researcher if you think this is a mistake.",
+            )
+        return cleaned_data
+
+
 
 @login_required
 def IntroView(request):

@@ -37,6 +37,15 @@ class SurveyQAForm(forms.ModelForm):
             "In the eye tracking study, I remember seeing Ads of the following brands:"
         )
 
+    def clean(self):
+        cleaned_data = super().clean()
+        user = cleaned_data.get("user")
+        if SurveyQA.objects.filter(user=user).exists():
+            self.add_error(
+                "user",
+                "You have already submitted the survey."
+            )
+        return cleaned_data
 
 def SurveyFormView(request):
     stage = UserStage.objects.get(user=request.user)
