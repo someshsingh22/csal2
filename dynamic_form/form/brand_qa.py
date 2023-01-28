@@ -6,6 +6,8 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.shortcuts import redirect, render
 from multiselectfield import MultiSelectField
+from itertools import chain
+from django.utils.safestring import mark_safe
 
 from .model import Brand, Experience, UserStage, Video
 from .survey import SurveyQA
@@ -149,6 +151,22 @@ class BrandDescQA(models.Model):
     def __str__(self):
         return f"{self.brand.name} - Description Questionnaire"
 
+class SpecialCheckboxSelectMultiple(forms.CheckboxSelectMultiple):
+    def render(self, name, value, attrs=None, choices=(), renderer=None):
+        output = []
+        for index, (option_value, option_label) in enumerate(chain(self.choices, choices)):
+            if value is None:
+                value = []
+            if option_value in value:
+                checked = ' checked="checked"'
+            else:
+                checked = ""
+            output.append(
+                '<label><input type="checkbox" name="%s" value="%s"%s /> <b>%s</b> %s</label>'
+                % (name, option_value, checked, option_label['title'], option_label['description'])
+            )
+        return mark_safe("".join(output))
+
 
 class BrandDecQAForm(forms.ModelForm):
     class Meta:
@@ -157,7 +175,7 @@ class BrandDecQAForm(forms.ModelForm):
         widgets = {
             "user": forms.HiddenInput(),
             "brand": forms.HiddenInput(),
-            "video_description_option_out": forms.CheckboxSelectMultiple(),
+            "video_description_option_out": SpecialCheckboxSelectMultiple(),
         }
         labels = {
             "video_description_option_out": "For the {brand} ad(s), Which of the following video descriptions do you remember seeing (Select all that apply)?",
@@ -173,21 +191,26 @@ class BrandDecQAForm(forms.ModelForm):
             "video_description_option_out"
         ].label.format(brand=brand.name)
         exp = Experience.objects.get(user=user)
-        in_videos = [video for video in exp.videos if video.brand == brand]
+        in_videos = Video.objects.filter(brand=brand, experience=exp).all()
         out_videos = (
             Video.objects.filter(brand=brand)
             .exclude(id__in=[video.id for video in in_videos])
-            .all()
         )
-        out_brand_videos = (
-            Video.objects.exclude(brand=brand)
-            .order_by("?")[: 5 - len(in_videos) - len(out_videos)]
-            .all()
-        )
-        videos = in_videos + out_videos + out_brand_videos
+        if 5 - len(in_videos) - out_videos.count() > 0:
+            out_brand_videos = (
+                Video.objects.exclude(brand=brand)
+                .order_by("?")[: 5 - len(in_videos) - len(out_videos)]
+                .all()
+            )
+            videos = list(in_videos) + list(out_videos.all()) + list(out_brand_videos)
+        else:
+            videos = list(in_videos) + list(out_videos.order_by("?")[:5 - len(in_videos)])
         random.shuffle(videos)
-        options = [(video.id, video.description) for video in videos]
-        self.fields["video_description_option_out"].choices = options
+
+        self.fields["video_description_option_out"].choices = [
+            (video.id, {"title": video.title, "description": video.desc})
+            for video in videos
+        ]
     
     def clean(self):
         cleaned_data = super().clean()
@@ -216,7 +239,7 @@ def BrandDescQAView(request, brand_id):
         else:
             return render(
                 request,
-                "form/brand_qa.html",
+                "form/brand_desc.html",
                 {"form": form, "brand": brand, "progress": progress, "total": 10},
             )
     else:
@@ -224,6 +247,6 @@ def BrandDescQAView(request, brand_id):
 
     return render(
         request,
-        "form/brand_qa.html",
+        "form/brand_desc.html",
         {"form": form, "brand": brand, "progress": progress, "total": 10},
     )

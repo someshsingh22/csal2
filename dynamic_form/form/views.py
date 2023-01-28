@@ -15,11 +15,12 @@ def home_view(request):
         user = request.user
         stage = UserStage.objects.get(user=user)
         gaze = Experience.objects.get(user=user).gaze
+
         if stage.stage == 1:
             message = "Please fill this short form to continue."
             link = "/intro"
             link_text = "Introduction"
-        if stage.stage == 2:
+        elif stage.stage == 2:
             if gaze == 0:
                 stage.update()
                 return redirect("/")
@@ -70,16 +71,21 @@ def home_view(request):
             link = "/experience"
             link_text = "Survey"
         else:
-            brands = [
+            brands = list([
                 v.brand for v in Experience.objects.get(user=user).videos.all()
-            ]
+                if v.brand
+            ])
+            unique_brands = []
+            for brand in brands:
+                if brand not in unique_brands:
+                    unique_brands.append(brand)
+            brands = unique_brands
             if stage.stage - 70 >= len(brands):
                 message = "Thank you for your participation!"
                 link = "/accounts/logout"
                 link_text = "Logout"
             else:
-                brand = brands[stage.stage - 70]
-                return redirect("/desc/" + str(brand.id))
+                redirect("/experience")
         return render(
             request,
             "home.html",
@@ -133,27 +139,34 @@ def experience_view(request):
         return redirect("/")
     elif stage >= 20 and stage < 50:
         brands = SurveyQA.objects.get(user=user).brand_recog.all()
-        if stage.stage < 50:
-            if stage.stage - 20 >= len(brands):
-                stage.update()
-                stage.stage = 50
-                stage.save()
+        if user_stage.stage < 50:
+            if user_stage.stage - 20 >= len(brands):
+                user_stage.update()
+                user_stage.stage = 50
+                user_stage.save()
                 return redirect("/")
             else:
-                brand = brands[stage.stage - 20]
+                brand = brands[user_stage.stage - 20]
                 return redirect("/brand/" + str(brand.id))
     elif stage >= 50 and stage < 70:
         scenes = Experience.objects.get(user=user).scene_seen.all()
-        scene = scenes[stage.stage - 50].id
+        scene = scenes[user_stage.stage - 50].id
         return redirect("/scene/" + str(scene))
     elif stage >= 70:
-        brands = [
+        brands = list([
             v.brand for v in Experience.objects.get(user=user).videos.all()
-        ]
-        if stage.stage - 70 >= len(brands):
+            if v.brand
+        ])
+        unique_brands = []
+        for brand in brands:
+            if brand not in unique_brands:
+                unique_brands.append(brand)
+        brands = unique_brands
+
+        if user_stage.stage - 70 >= len(brands):
             return redirect("/")
         else:
-            brand = brands[stage.stage - 70]
+            brand = brands[user_stage.stage - 70]
             return redirect("/desc/" + str(brand.id))
     else:
         return redirect("/")

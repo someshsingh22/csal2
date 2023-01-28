@@ -206,7 +206,9 @@ class ConsistencyForm(forms.ModelForm):
         fields = ["user", "watched"]
         widgets = {
             "user": forms.HiddenInput(),
-            "watched": forms.RadioSelect(),
+            "watched": forms.RadioSelect(
+                choices=[(True, "Yes"), (False, "No")], attrs={"class": "radio"}
+            ),
         }
         labels = {
             "watched": "Did you watch this video in this assignment?",

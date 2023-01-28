@@ -32,13 +32,12 @@ class ScenesQAForm(forms.ModelForm):
             "scene": forms.HiddenInput(),
         }
     
-    #override clean method to avoid duplicate form submission
     def clean(self):
         cleaned_data = super().clean()
         user = cleaned_data.get("user")
         scene = cleaned_data.get("scene")
         if SceneQA.objects.filter(user=user, scene=scene).exists():
-            raise forms.ValidationError("You have already submitted this form")
+            self.add_error("seen", "You have already submitted this form")
         return cleaned_data
 
 
