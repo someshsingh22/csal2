@@ -31,6 +31,14 @@ def home_view(request):
             message = "Please watch the videos to continue."
             link = "/experience"
             link_text = "Videos"
+        elif stage.stage == 16:
+            message = "Please watch the videos to continue."
+            link = "/experience"
+            link_text = "Videos"
+        elif stage.stage == 17:
+            message = "Please answer this question to continue."
+            link = "/consistency_check"
+            link_text = "Question"
         elif stage.stage == 18:
             time_elapsed = timezone.now() - stage.last_updated
             time_remaining = (WAIT_TIME - time_elapsed).total_seconds()
@@ -57,16 +65,33 @@ def home_view(request):
             message = "Please answer the questions to continue."
             link = "/survey"
             link_text = "survey"
-        elif stage.stage >= 20 and stage.stage < 40:
-            return redirect("/experience")
-        elif stage.stage >= 40:
+        else:
             brands = SurveyQA.objects.get(user=user).brand_recog.all()
-            if stage.stage - 40 >= len(brands):
-                message = "Thank you for your participation!"
-                link = "/accounts/logout"
-                link_text = "Logout"
+            if stage.stage < 50:
+                if stage.stage - 20 >= len(brands):
+                    stage.update()
+                    stage.stage = 50
+                    stage.save()
+                    return redirect("/")
+                else:
+                    brand = brands[stage.stage - 20]
+                    return redirect("/brand/" + str(brand.id))
             else:
-                return redirect("/experience")
+                if stage.stage < 70:
+                    scenes = Experience.objects.get(user=user).scene_seen.all()
+                    scene = scenes[stage.stage - 50].id
+                    return redirect("/scene/" + str(scene))
+                else:
+                    brands = [
+                        v.brand for v in Experience.objects.get(user=user).videos.all()
+                    ]
+                    if stage.stage - 70 >= len(brands):
+                        message = "Thank you for your participation!"
+                        link = "/accounts/logout"
+                        link_text = "Logout"
+                    else:
+                        brand = brands[stage.stage - 70]
+                        return redirect("/desc/" + str(brand.id))
         return render(
             request,
             "home.html",
@@ -92,8 +117,7 @@ def experience_view(request):
     ]
     video_stages = [3, 4, 5, 7, 8, 9, 11, 12, 13, 14]
     popup_stages = [6, 10, 15]
-    scene_stages = list(range(20, 40))
-    extra_video, consistency_check = 16, 17
+    extra_video = 16
 
     if stage in video_stages:
         video = videos[video_stages.index(stage)]
@@ -114,22 +138,6 @@ def experience_view(request):
         else:
             video_id = Experience.objects.get(user=request.user).videos.all()[uid].id
         return redirect(f"/video/{video_id}/0?extra=True")
-    elif stage == consistency_check:
-        return redirect(f"/consistency_check")
-    elif stage < scene_stages[0]:
-        return redirect(f"/")
-    elif stage in scene_stages:
-        print(stage)
-        print(scene_stages[0])
-        print(len(scenes))
-        scene_idx = stage - scene_stages[0]
-        print(scene_idx)
-        scene = scenes[scene_idx]
-        return redirect(f"/scene/{scene.id}")
     else:
-        brands = SurveyQA.objects.get(user=user).brand_recog.all()
-        if stage - (scene_stages[-1] + 1) >= len(brands):
-            return redirect("/")
-        else:
-            brand = brands[stage - (scene_stages[-1] + 1)]
-            return redirect(f"/brand/{brand.id}")
+        print("Invalid stage, redirecting to home, stage: ", stage)
+        return redirect("/")

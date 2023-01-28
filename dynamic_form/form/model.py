@@ -37,9 +37,10 @@ class Video(models.Model):
     src = models.CharField(max_length=100)
     length = models.IntegerField()
     desc = models.CharField(max_length=600)
+    title = models.CharField(max_length=100)
 
     def __str__(self):
-        return self.name
+        return self.title + " - " + self.brand.name + " - " + self.name
 
 
 class VideoScene(models.Model):
@@ -58,6 +59,7 @@ class Experience(models.Model):
     prod_used_options = models.ManyToManyField(Brand, related_name="prod_used")
     brand_recog = models.ManyToManyField(Brand, related_name="brand_recog_options")
     scene_seen = models.ManyToManyField(VideoScene, related_name="scene_seen_options")
+    exp_start = models.DateTimeField(default=None, null=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.videos.all()}"

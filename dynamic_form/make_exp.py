@@ -5,7 +5,7 @@ columns = ["id", "email", "name", "pass"]
 users.columns = columns
 
 videos = pd.read_csv("data_new/videos.tsv", sep="\t", header=None)
-columns = ["id", "name", "brand_id", "src", "length", "desc"]
+columns = ["id", "name", "brand_id", "src", "length", "desc", "title"]
 videos.columns = columns
 
 scenes = pd.read_csv("data_new/scenes.tsv", sep="\t", header=None)
@@ -31,7 +31,7 @@ def make_experience():
     brand_1_ids = ",".join(brand_1_2_set[:15]["id"].astype(str))
     brand_2_ids = ",".join(brand_1_2_set[15:]["id"].astype(str))
     brand_op_ids = ",".join(brand_op_set.astype(str))
-    scene_set_ids = ",".join(scene_set["id"].astype(str))
+    scene_set_ids = ",".join(scene_set.sample(frac=1)["id"].astype(str))
     return video_set_ids, brand_1_ids, brand_2_ids, brand_op_ids, scene_set_ids
 
 
@@ -59,6 +59,6 @@ users["brand_2_ids"] = brand_2_ids
 users["brand_op_ids"] = brand_op_ids
 users["eyetracker"] = 0
 users["scene_set_ids"] = scene_set_ids
-users["id"]+=1
+users["id"] += 1
 
 users.to_csv("data_new/exp.tsv", sep="\t", index=False, header=False)

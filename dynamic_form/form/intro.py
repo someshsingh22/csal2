@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from multiselectfield import MultiSelectField
 
 from .model import Brand, Experience, UserStage
@@ -30,7 +31,7 @@ class Introduction(models.Model):
         max_choices=7,
         max_length=100,
     )
-    submit_duration = models.IntegerField(default=0)
+    submit_time = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.user.username}_Introduction"
@@ -68,11 +69,9 @@ class IntroductionForm(forms.ModelForm):
             "youtube_sub",
             "youtube_mobile",
             "apprise",
-            "submit_duration",
         ]
         widgets = {
             "experience": forms.HiddenInput(),
-            "submit_duration": forms.HiddenInput(),
             "brands_seen": forms.CheckboxSelectMultiple(),
             "prod_used": forms.CheckboxSelectMultiple(),
             "apprise": forms.CheckboxSelectMultiple(),
@@ -87,6 +86,7 @@ class IntroductionForm(forms.ModelForm):
 @login_required
 def IntroView(request):
     user = request.user
+    exp = Experience.objects.get(user=user)
     stage = UserStage.objects.get(user=user)
     if request.method == "POST":
         form = IntroductionForm(request.POST)
@@ -94,6 +94,7 @@ def IntroView(request):
             form.save()
             stage.stage = max(2, stage.stage)
             stage.save()
+            exp.start_time = timezone.now()
             return redirect("/")
         else:
             print(form.errors)

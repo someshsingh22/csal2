@@ -1,7 +1,7 @@
 from django.urls import path
 from django.views.generic import TemplateView
 
-from .brand_qa import BrandQAView
+from .brand_qa import BrandDescQAView, BrandQAView
 from .calibration import CalibrateView
 from .intro import IntroView
 from .popup import popup_slice
@@ -21,4 +21,5 @@ urlpatterns = [
     path("survey", SurveyFormView, name="survey"),
     path("calib", CalibrateView, name="calibration"),
     path("consistency_check", consistency_view, name="consistency_check"),
+    path("desc/<int:brand_id>", BrandDescQAView, name="desc"),
 ]

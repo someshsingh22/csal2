@@ -6,7 +6,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.shortcuts import redirect, render
 
-from .model import Experience, UserStage, Video
+from .model import UserStage, Video
 
 MIN_TIMER = 15000
 TIME_LIMIT = 15
@@ -133,6 +133,7 @@ class GazeModel(models.Model):
     video = models.ForeignKey(Video, on_delete=models.CASCADE)
     gaze_x = models.TextField(blank=True, null=False)
     gaze_y = models.TextField(blank=True, null=False)
+    submit_time = models.DateTimeField(auto_now=True)
 
 
 class GazeForm(forms.ModelForm):
@@ -193,7 +194,7 @@ def video_view(request, video_id, gaze):
 class ConsistencyModel(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     watched = models.BooleanField()
-    submit_duration = models.IntegerField(default=0)
+    submit_time = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.user} - {self.watched}"
@@ -202,10 +203,9 @@ class ConsistencyModel(models.Model):
 class ConsistencyForm(forms.ModelForm):
     class Meta:
         model = ConsistencyModel
-        fields = ["user", "submit_duration", "watched"]
+        fields = ["user", "watched"]
         widgets = {
             "user": forms.HiddenInput(),
-            "submit_duration": forms.HiddenInput(),
             "watched": forms.RadioSelect(),
         }
         labels = {

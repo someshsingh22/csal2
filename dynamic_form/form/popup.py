@@ -27,7 +27,8 @@ class Popup(models.Model):
     seen_brand_before = models.BooleanField()
     heard_before = models.BooleanField()
     clear_product = models.BooleanField()
-    submit_duration = models.IntegerField(default=0)
+    clear_brand = models.BooleanField()
+    submit_time = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.video.name}"
@@ -56,10 +57,13 @@ class PopupSliceForm(forms.Form):
         choices=[],
         widget=forms.CheckboxSelectMultiple,
         required=False,
-        label="For the previously seen ad(s) Check if the product being advertised is clear",
+        label="For which of the ads you saw now were you able to infer the product being advertised",
     )
-    submit_duration = forms.IntegerField(
-        widget=forms.HiddenInput(), initial=0, required=False
+    clear_brand = forms.MultipleChoiceField(
+        choices=[],
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label="For which of the ads you saw now were you able to infer the brand being advertised",
     )
 
     def __init__(self, videos, *args, **kwargs):
@@ -95,6 +99,13 @@ class PopupSliceForm(forms.Form):
             (video.id, f"{NUMERIC_MAPPING[index]} ({video.brand.name})")
             for index, video in enumerate(videos)
         ]
+        self.fields["clear_brand"].choices = [
+            (
+                brand.id,
+                club_options[brand],
+            )
+            for brand in video_brands
+        ]
 
 
 @login_required
@@ -119,7 +130,6 @@ def popup_slice(request, start, end):
                     in form.cleaned_data["seen_brand_before"],
                     heard_before=video.brand.id in form.cleaned_data["heard_before"],
                     clear_product=video.id in form.cleaned_data["clear_product"],
-                    submit_duration=form.cleaned_data["submit_duration"],
                 )
                 popup.save()
             user_stage.update()
