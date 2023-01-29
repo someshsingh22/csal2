@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.shortcuts import redirect, render
 from django.utils.safestring import mark_safe
+from django.views.decorators.cache import cache_control
 from multiselectfield import MultiSelectField
 
 from .model import Brand, Experience, UserStage, Video
@@ -96,29 +97,19 @@ class BrandQAForm(forms.ModelForm):
             "scene_description"
         ].label.format(brand=brand.name)
 
-    def clean(self):
-        cleaned_data = super().clean()
-        user = cleaned_data.get("user")
-        brand = cleaned_data.get("brand")
-        if BrandQA.objects.filter(user=user, brand=brand).exists():
-            self.add_error(
-                "user",
-                f"You have already completed the questionnaire for {brand.name}",
-            )
-        audio_types = cleaned_data.get("audio_types")
-        if len(audio_types) == 0:
-            self.add_error(
-                "audio_types", "Please select at least one audio type for the ad(s)"
-            )
-
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def BrandQAView(request, brand_id):
     brand = Brand.objects.get(id=brand_id)
     user = request.user
     userstage = UserStage.objects.get(user=user)
     total = SurveyQA.objects.get(user=user).brand_recog.count()
     progress = BrandQA.objects.filter(user=user).count() + 1
+
+    if BrandQA.objects.filter(user=user, brand=brand).exists():
+        return redirect("/experience")
+
     if request.method == "POST":
         form = BrandQAForm(request.POST, user=user, brand=brand)
         if form.is_valid():
@@ -221,24 +212,17 @@ class BrandDecQAForm(forms.ModelForm):
             for video in videos
         ]
 
-    def clean(self):
-        cleaned_data = super().clean()
-        user = cleaned_data.get("user")
-        brand = cleaned_data.get("brand")
-        if BrandDescQA.objects.filter(user=user, brand=brand).exists():
-            self.add_error(
-                "user",
-                f"You have already completed the questionnaire for {brand.name}",
-            )
-        return cleaned_data
-
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def BrandDescQAView(request, brand_id):
     brand = Brand.objects.get(id=brand_id)
     user = request.user
     userstage = UserStage.objects.get(user=user)
     progress = BrandDescQA.objects.filter(user=user).count() + 1
+
+    if BrandDescQA.objects.filter(user=user, brand=brand).exists():
+        return redirect("/experience")
 
     if request.method == "POST":
         form = BrandDecQAForm(request.POST, user=user, brand=brand)

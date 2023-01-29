@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import models
 from django.shortcuts import redirect, render
+from django.views.decorators.cache import cache_control
 
 from .model import UserStage, Video
 
@@ -149,6 +150,7 @@ class GazeForm(forms.ModelForm):
 
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def video_view(request, video_id, gaze):
     video = Video.objects.get(id=video_id)
     src, length = video.src, video.length
@@ -159,6 +161,9 @@ def video_view(request, video_id, gaze):
         timer = random.randint(MIN_TIMER, max(MIN_TIMER + 1, length - 5000))
 
     progress = GazeModel.objects.filter(user=request.user).count() + 1
+
+    if GazeModel.objects.filter(user=request.user, video=video).exists():
+        return redirect("/experience")
 
     if request.method == "POST":
         form = GazeForm(request.POST)
@@ -216,7 +221,10 @@ class ConsistencyForm(forms.ModelForm):
 
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def consistency_view(request):
+    if ConsistencyModel.objects.filter(user=request.user).exists():
+        return redirect("/experience")
     if request.method == "POST":
         form = ConsistencyForm(request.POST)
         if form.is_valid():

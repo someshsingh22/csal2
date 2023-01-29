@@ -1,10 +1,11 @@
 from django import forms
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import models
 from django.shortcuts import redirect, render
-from django.utils.safestring import mark_safe
+from django.views.decorators.cache import cache_control
 
-from .model import Brand, Experience, UserStage, VideoScene
+from .model import Brand, Experience, UserStage
 
 
 class SurveyQA(models.Model):
@@ -37,15 +38,12 @@ class SurveyQAForm(forms.ModelForm):
             "In the eye tracking study, I remember seeing Ads of the following brands:"
         )
 
-    def clean(self):
-        cleaned_data = super().clean()
-        user = cleaned_data.get("user")
-        if SurveyQA.objects.filter(user=user).exists():
-            self.add_error("user", "You have already submitted the survey.")
-        return cleaned_data
 
-
+@login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def SurveyFormView(request):
+    if SurveyQA.objects.filter(user=request.user).exists():
+        return redirect("/experience")
     stage = UserStage.objects.get(user=request.user)
     if request.method == "POST":
         form = SurveyQAForm(request.POST, user=request.user)

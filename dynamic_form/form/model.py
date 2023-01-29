@@ -52,14 +52,14 @@ class VideoScene(models.Model):
 
 
 class Experience(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
     videos = models.ManyToManyField(Video)
     gaze = models.IntegerField(default=0)
     brands_seen_options = models.ManyToManyField(Brand, related_name="brands_seen")
     prod_used_options = models.ManyToManyField(Brand, related_name="prod_used")
     brand_recog = models.ManyToManyField(Brand, related_name="brand_recog_options")
     scene_seen = models.ManyToManyField(VideoScene, related_name="scene_seen_options")
-    exp_start = models.DateTimeField(default=None, null=True)
+    cc_v = models.IntegerField()
 
     def __str__(self):
         return f"{self.user.username} - {self.videos.all()}"

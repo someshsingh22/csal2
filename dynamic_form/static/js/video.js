@@ -1,4 +1,7 @@
-document.addEventListener('fullscreenchange', exitHandler, false);
+document.addEventListener("fullscreenchange", exitHandler, false);
+document.addEventListener("mozfullscreenchange", exitHandler, false);
+document.addEventListener("webkitfullscreenchange", exitHandler, false);
+document.addEventListener("msfullscreenchange", exitHandler, false);
 var curr_time = 0;
 var flag = false;
 var check_form = document.getElementById("check");
@@ -27,16 +30,53 @@ function webgazer_init() {
     webgazer.showVideo(false);
 }
 
+function req_fs(){
+    if (video.requestFullscreen) {
+        video.requestFullscreen();
+    }
+    else if (video.mozRequestFullScreen) {
+        video.mozRequestFullScreen();
+    }
+    else if (video.webkitEnterFullscreen) {
+        video.webkitEnterFullscreen();
+    }
+    else if (video.webkitRequestFullScreen) {
+        video.webkitRequestFullScreen();
+    }
+    else if (video.msRequestFullscreen) {
+        video.msRequestFullscreen();
+    }
+    else {
+        alert("Your browser doesn't support fullscreen mode");
+    }
+}
+
+function cancel_fs(){
+    if (video.exitFullscreen) {
+        video.exitFullscreen();
+    }
+    else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+    }
+    else if (video.webkitExitFullScreen) {
+        video.webkitExitFullScreen();
+    }
+    else if (video.msExitFullscreen) {
+        video.msExitFullscreen();
+    }
+}
+
+
 function play(timer, gaze) {
     if (gaze == 1) webgazer_init();
-    video.requestFullscreen();
+    req_fs();
     video.play();
     setTimeout(function() {
         check_form.hidden = false;
         play_div.hidden = true;
         flag = true;
         video.pause();
-        video.webkitExitFullscreen();
+        cancel_fs();
         curr_time = Math.floor(Date.now() / 1000);
     }, timer);
 }
@@ -50,14 +90,14 @@ function sequel(time_limit) {
     check_form.hidden = true;
     play_div.hidden = false;
     flag = false;
-    video.requestFullscreen();
+    req_fs();
     video.play();
 }
 
 video.onended = function() {
     if (typeof webgazer !== 'undefined') webgazer.pause();
     flag = true;
-    video.webkitExitFullscreen();
+    cancel_fs();
     gaze_form.hidden = false;
     play_div.hidden = true;
     gaze_input_x.value = x;
@@ -69,15 +109,16 @@ video.onended = function() {
 function exitHandler(){
 if (!document.fullscreenElement && !flag){
     video.pause();
-    video.webkitExitFullscreen();
+    cancel_fs();
     alert("You can't exit the video, please watch again!");
     location.reload();
 }
 }
+
 video.addEventListener('click', function() {
 flag = true;
 video.pause();
-video.webkitExitFullscreen();
+cancel_fs();
 alert("You can't pause the video, please watch again!");
 location.reload();
 });

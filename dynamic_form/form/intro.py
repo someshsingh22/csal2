@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.shortcuts import redirect, render
 from django.utils import timezone
+from django.views.decorators.cache import cache_control
 from multiselectfield import MultiSelectField
 
 from .model import Brand, Experience, UserStage
@@ -82,22 +83,17 @@ class IntroductionForm(forms.ModelForm):
             "apprise": "How do you apprise yourself of the latest products and brands? (Multi correct)",
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
-        exp = cleaned_data.get("experience")
-        if Introduction.objects.filter(experience=exp).exists():
-            self.add_error(
-                "experience",
-                "You have already filled this form. Please contact the researcher if you think this is a mistake.",
-            )
-        return cleaned_data
-
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def IntroView(request):
     user = request.user
     exp = Experience.objects.get(user=user)
     stage = UserStage.objects.get(user=user)
+
+    if Introduction.objects.filter(experience=exp).exists():
+        return redirect("/")
+
     if request.method == "POST":
         form = IntroductionForm(request.POST)
         if form.is_valid():

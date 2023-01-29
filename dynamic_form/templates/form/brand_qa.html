@@ -17,13 +17,6 @@
             {{ field }}
         </div>
     {% endfor %}
-          {% for field in form %}
-          {% for error in field.errors %}
-              <div class="alert alert-danger" role="alert">
-                  {{ error }} <a href="/experience">Click here to continue</a>
-              </div>
-          {% endfor %}
-          {% endfor %}
   <button class="btn btn-primary" type="submit">Submit</button>
 </form>
 {% endblock %}

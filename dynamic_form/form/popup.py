@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import models
 from django.shortcuts import redirect, render
+from django.views.decorators.cache import cache_control
 
 from .model import Brand, Experience, UserStage, Video
 
@@ -109,6 +110,7 @@ class PopupSliceForm(forms.Form):
 
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def popup_slice(request, start, end):
     user = request.user
     exp = Experience.objects.get(user=user)
@@ -116,6 +118,9 @@ def popup_slice(request, start, end):
     videos = videos[start:end]
     form = PopupSliceForm(videos)
     user_stage = UserStage.objects.get(user=user)
+
+    if Popup.objects.filter(user=user, video__in=videos).exists():
+        return redirect("/experience")
 
     if request.method == "POST":
         form = PopupSliceForm(videos, request.POST)

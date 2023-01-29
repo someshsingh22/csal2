@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import models
 from django.shortcuts import redirect, render
+from django.views.decorators.cache import cache_control
 
 from .model import UserStage, VideoScene
 
@@ -32,19 +33,16 @@ class ScenesQAForm(forms.ModelForm):
             "scene": forms.HiddenInput(),
         }
 
-    def clean(self):
-        cleaned_data = super().clean()
-        user = cleaned_data.get("user")
-        scene = cleaned_data.get("scene")
-        if SceneQA.objects.filter(user=user, scene=scene).exists():
-            self.add_error("seen", "You have already submitted this form")
-        return cleaned_data
-
 
 @login_required
+@cache_control(no_cache=True, must_revalidate=True, no_store=True)
 def SceneQAView(request, scene_id):
     scene = VideoScene.objects.get(id=scene_id)
     user_stage = UserStage.objects.get(user=request.user)
+
+    if SceneQA.objects.filter(user=request.user, scene=scene).exists():
+        return redirect("/experience")
+
     if request.method == "POST":
         form = ScenesQAForm(request.POST)
         if form.is_valid():

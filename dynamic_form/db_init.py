@@ -1,11 +1,15 @@
+import argparse
 import csv
 import logging
 import os
-import random
 import sys
 
 import django
 from tqdm import tqdm
+
+argparser = argparse.ArgumentParser()
+argparser.add_argument("--fresh", type=bool, default=True)
+args = argparser.parse_args()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -88,9 +92,7 @@ def create_update_get_user_stage(id, username, name, password):
 
 def create_update_video_scene(id, video_id, url):
     if not Video.objects.filter(id=video_id).exists():
-        logging.error(
-            f"VideoScene {id} not created. Video {video_id} does not exist."
-        )
+        logging.error(f"VideoScene {id} not created. Video {video_id} does not exist.")
         return
     video = Video.objects.get(id=video_id)
     if VideoScene.objects.filter(id=id).exists():
@@ -105,23 +107,24 @@ def create_update_video_scene(id, video_id, url):
 
 
 if __name__ == "__main__":
-    with open("data_new/brands.tsv") as f:
-        reader = csv.reader(f, delimiter="\t")
-        for row in tqdm(reader, total=276):
-            name, id = row
-            create_update_brand(name, id)
+    if args.fresh:
+        with open("data_new/brands.tsv") as f:
+            reader = csv.reader(f, delimiter="\t")
+            for row in tqdm(reader, total=276):
+                name, id = row
+                create_update_brand(name, id)
 
-    with open("data_new/videos.tsv") as f:
-        reader = csv.reader(f, delimiter="\t")
-        for row in tqdm(reader, total=2205):
-            id, name, brand_id, src, length, desc, title = row
-            create_update_video(id, name, brand_id, src, length, desc, title)
+        with open("data_new/videos.tsv") as f:
+            reader = csv.reader(f, delimiter="\t")
+            for row in tqdm(reader, total=2205):
+                id, name, brand_id, src, length, desc, title = row
+                create_update_video(id, name, brand_id, src, length, desc, title)
 
-    with open("data_new/scenes.tsv") as f:
-        reader = csv.reader(f, delimiter="\t")
-        for row in tqdm(reader, total=4424):
-            id, video_id, url = row
-            create_update_video_scene(id, video_id, url)
+        with open("data_new/scenes.tsv") as f:
+            reader = csv.reader(f, delimiter="\t")
+            for row in tqdm(reader, total=4424):
+                id, video_id, url = row
+                create_update_video_scene(id, video_id, url)
 
     with open("data_new/exp.tsv") as f:
         reader = csv.reader(f, delimiter="\t")
@@ -136,6 +139,7 @@ if __name__ == "__main__":
             brand_recog_ids,
             eyetracker,
             scene_ids,
+            cc_v,
         ) in tqdm(reader, total=620):
             if int(id) > USER_LIMIT:
                 logging.log(logging.INFO, "User limit reached. Breaking.")
@@ -190,6 +194,7 @@ if __name__ == "__main__":
             else:
                 experience = Experience.objects.create(
                     user=user,
+                    cc_v=cc_v,
                 )
                 logging.info(f"Experience {username} created.")
 
@@ -199,4 +204,5 @@ if __name__ == "__main__":
             experience.brand_recog.set(brand_recogs)
             experience.gaze = int(eyetracker)
             experience.scene_seen.set(scenes)
+            experience.cc_v = cc_v
             experience.save()
