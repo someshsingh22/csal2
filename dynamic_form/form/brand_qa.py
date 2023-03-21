@@ -17,7 +17,6 @@ from .survey import SurveyQA
 class BrandQA(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE)
-    scene_description = models.CharField(max_length=1000)
     audio_types = MultiSelectField(
         choices=[
             (0, "Narration"),
@@ -54,17 +53,12 @@ class BrandQAForm(forms.ModelForm):
         widget=forms.RadioSelect,
         label="Have you ever used {brand} before?",
     )
-    scene_description = forms.CharField(
-        widget=forms.Textarea(attrs={"rows": 3}),
-        label="For the {brand} ad(s), I remember seeing the following (Write Scene Descriptions, feel free to write any scenes, music,characters,emotions,objects you remember seeing)",
-    )
 
     class Meta:
         model = BrandQA
         fields = [
             "user",
             "brand",
-            "scene_description",
             "audio_types",
             "prod_usage",
             "used_before",
@@ -93,9 +87,6 @@ class BrandQAForm(forms.ModelForm):
         self.fields["used_before"].label = self.fields["used_before"].label.format(
             brand=brand.name
         )
-        self.fields["scene_description"].label = self.fields[
-            "scene_description"
-        ].label.format(brand=brand.name)
 
 
 @login_required

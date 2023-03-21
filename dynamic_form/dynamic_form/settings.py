@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-2ji^2m%&%d&5+(q@#@@sjpi(q4(sr8^__+zzw40aqp7oxp6xwb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["admemorability.pythonanywhere.com"]
+ALLOWED_HOSTS = []
 
 
 INSTALLED_APPS = [
@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "form.apps.FormConfig",
+    "import_export",
 ]
 
 MIDDLEWARE = [
@@ -98,7 +99,7 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 
 USE_TZ = True
-STATIC_ROOT = BASE_DIR / "staticfiles"
+
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 
@@ -108,4 +109,3 @@ ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = False
 
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
-SECURE_SSL_REDIRECT = True

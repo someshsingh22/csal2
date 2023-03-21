@@ -163,7 +163,10 @@ def video_view(request, video_id, gaze):
     progress = GazeModel.objects.filter(user=request.user).count() + 1
 
     if GazeModel.objects.filter(user=request.user, video=video).exists():
-        return redirect("/experience")
+        if request.GET.get("extra") == "True":
+            pass
+        else:
+            return redirect("/experience")
 
     if request.method == "POST":
         form = GazeForm(request.POST)

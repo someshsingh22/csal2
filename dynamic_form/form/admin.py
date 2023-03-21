@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from import_export import resources
 from import_export.admin import ImportExportModelAdmin
 
-from .model import Brand, Experience, UserStage, Video, VideoScene
+from .model import AudioClip, Brand, Experience, UserStage, Video, VideoScene
 
 TO_BE_REGISTERED = [
     "Brand",
@@ -12,6 +12,7 @@ TO_BE_REGISTERED = [
     "VideoScene",
     "UserStage",
     "User",
+    "AudioClip",
 ]
 
 
@@ -40,6 +41,11 @@ class UserStageResource(resources.ModelResource):
         model = UserStage
 
 
+class AudioClipResource(resources.ModelResource):
+    class Meta:
+        model = AudioClip
+
+
 class BrandAdmin(ImportExportModelAdmin):
     resource_class = BrandResource
 
@@ -60,8 +66,13 @@ class UserStageAdmin(ImportExportModelAdmin):
     resource_class = UserStageResource
 
 
+class AudioClipAdmin(ImportExportModelAdmin):
+    resource_class = AudioClipResource
+
+
 admin.site.register(Brand, BrandAdmin)
 admin.site.register(Experience, ExperienceAdmin)
 admin.site.register(Video, VideoAdmin)
 admin.site.register(VideoScene, VideoSceneAdmin)
 admin.site.register(UserStage, UserStageAdmin)
+admin.site.register(AudioClip, AudioClipAdmin)

@@ -7,7 +7,8 @@ from django.utils import timezone
 from .model import Experience, UserStage, Video
 from .survey import SurveyQA
 
-WAIT_TIME = datetime.timedelta(seconds=10)
+WAIT_TIME = datetime.timedelta(milliseconds=10000)
+DESC_FLAG = False
 
 
 def home_view(request):
@@ -66,29 +67,35 @@ def home_view(request):
             message = "Please answer the questions to continue."
             link = "/survey"
             link_text = "Survey"
-        elif stage.stage >= 20 and stage.stage <= 70:
+        elif stage.stage >= 20 and stage.stage <= 90:
             message = "Please answer the questions to continue."
             link = "/experience"
             link_text = "Survey"
         else:
-            brands = list(
-                [
-                    v.brand
-                    for v in Experience.objects.get(user=user).videos.all()
-                    if v.brand
-                ]
-            )
-            unique_brands = []
-            for brand in brands:
-                if brand not in unique_brands:
-                    unique_brands.append(brand)
-            brands = unique_brands
-            if stage.stage - 70 >= len(brands):
+            if DESC_FLAG:
+                brands = list(
+                    [
+                        v.brand
+                        for v in Experience.objects.get(user=user).videos.all()
+                        if v.brand
+                    ]
+                )
+                unique_brands = []
+                for brand in brands:
+                    if brand not in unique_brands:
+                        unique_brands.append(brand)
+                brands = unique_brands
+                if stage.stage - 90 >= len(brands):
+                    message = "Thank you for your participation!"
+                    link = "/accounts/logout"
+                    link_text = "Logout"
+                else:
+                    redirect("/experience")
+
+            else:
                 message = "Thank you for your participation!"
                 link = "/accounts/logout"
                 link_text = "Logout"
-            else:
-                redirect("/experience")
         return render(
             request,
             "home.html",
@@ -145,20 +152,32 @@ def experience_view(request):
         scenes = Experience.objects.get(user=user).scene_seen.all()
         scene = scenes[user_stage.stage - 50].id
         return redirect("/scene/" + str(scene))
-    elif stage >= 70:
-        brands = list(
-            [v.brand for v in Experience.objects.get(user=user).videos.all() if v.brand]
-        )
-        unique_brands = []
-        for brand in brands:
-            if brand not in unique_brands:
-                unique_brands.append(brand)
-        brands = unique_brands
+    elif stage >= 70 and stage < 90:
+        audios = Experience.objects.get(user=user).audio_seen.all()
+        audio_id = audios[user_stage.stage - 70].id
+        return redirect("/audio/" + str(audio_id))
 
-        if user_stage.stage - 70 >= len(brands):
-            return redirect("/")
+    elif stage >= 90:
+        if DESC_FLAG:
+            brands = list(
+                [
+                    v.brand
+                    for v in Experience.objects.get(user=user).videos.all()
+                    if v.brand
+                ]
+            )
+            unique_brands = []
+            for brand in brands:
+                if brand not in unique_brands:
+                    unique_brands.append(brand)
+            brands = unique_brands
+
+            if user_stage.stage - 90 >= len(brands):
+                return redirect("/")
+            else:
+                brand = brands[user_stage.stage - 90]
+                return redirect("/desc/" + str(brand.id))
         else:
-            brand = brands[user_stage.stage - 70]
-            return redirect("/desc/" + str(brand.id))
+            return redirect("/")
     else:
         return redirect("/")

@@ -23,9 +23,9 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "dynamic_form.settings")
 django.setup()
 
 from django.contrib.auth.models import User
-from form.model import Brand, Experience, UserStage, Video, VideoScene
+from form.model import AudioClip, Brand, Experience, UserStage, Video, VideoScene
 
-USER_LIMIT = 1000
+USER_LIMIT = 10
 
 
 def create_update_brand(name, id):
@@ -106,6 +106,22 @@ def create_update_video_scene(id, video_id, url):
     video_scene.save()
 
 
+def create_update_audio_clip(id, video_id, url):
+    if not Video.objects.filter(id=video_id).exists():
+        logging.error(f"VideoScene {id} not created. Video {video_id} does not exist.")
+        return
+    video = Video.objects.get(id=video_id)
+    if AudioClip.objects.filter(id=id).exists():
+        audio_clip = AudioClip.objects.get(id=id)
+        audio_clip.video = video
+        audio_clip.url = url
+        logging.warning(f"AudioClip {id} already exists. Updated.")
+    else:
+        audio_clip = AudioClip.objects.create(id=id, video=video, url=url)
+        logging.info(f"AudioClip {id} created.")
+    audio_clip.save()
+
+
 if __name__ == "__main__":
     if args.fresh:
         with open("data_new/brands.tsv") as f:
@@ -116,7 +132,7 @@ if __name__ == "__main__":
 
         with open("data_new/videos.tsv") as f:
             reader = csv.reader(f, delimiter="\t")
-            for row in tqdm(reader, total=2205):
+            for row in tqdm(reader, total=2821):
                 id, name, brand_id, src, length, desc, title = row
                 create_update_video(id, name, brand_id, src, length, desc, title)
 
@@ -125,6 +141,12 @@ if __name__ == "__main__":
             for row in tqdm(reader, total=4424):
                 id, video_id, url = row
                 create_update_video_scene(id, video_id, url)
+
+        with open("data_new/audio_clips.tsv") as f:
+            reader = csv.reader(f, delimiter="\t")
+            for row in tqdm(reader, total=4424):
+                id, video_id, url = row
+                create_update_audio_clip(id, video_id, url)
 
     with open("data_new/exp.tsv") as f:
         reader = csv.reader(f, delimiter="\t")
@@ -139,8 +161,9 @@ if __name__ == "__main__":
             brand_recog_ids,
             eyetracker,
             scene_ids,
+            audio_clip_ids,
             cc_v,
-        ) in tqdm(reader, total=620):
+        ) in tqdm(reader, total=min(620, USER_LIMIT)):
             if int(id) > USER_LIMIT:
                 logging.log(logging.INFO, "User limit reached. Breaking.")
                 break
@@ -151,7 +174,16 @@ if __name__ == "__main__":
             brand_used_option_ids = brand_used_option_ids.split(",")
             brand_recog_ids = brand_recog_ids.split(",")
             scene_ids = scene_ids.split(",")
-            videos, brand_seen_options, brand_used_options, brand_recogs, scenes = (
+            audio_clip_ids = audio_clip_ids.split(",")
+            (
+                videos,
+                brand_seen_options,
+                brand_used_options,
+                brand_recogs,
+                scenes,
+                audio_clips,
+            ) = (
+                [],
                 [],
                 [],
                 [],
@@ -160,43 +192,57 @@ if __name__ == "__main__":
             )
             for vid in video_ids:
                 if not Video.objects.filter(id=vid).exists():
-                    logging.error(f"Video {vid} does not exist.")
+                    pass
+                    # logging.error(f"Video {vid} does not exist.")
                 else:
                     videos.append(Video.objects.get(id=vid))
 
             for brand_id in brand_seen_option_ids:
                 if not Brand.objects.filter(id=brand_id).exists():
-                    logging.error(f"Brand {brand_id} does not exist.")
+                    pass
+                    # logging.error(f"Brand {brand_id} does not exist.")
                 else:
                     brand_seen_options.append(Brand.objects.get(id=brand_id))
 
             for brand_id in brand_used_option_ids:
                 if not Brand.objects.filter(id=brand_id).exists():
-                    logging.error(f"Brand {brand_id} does not exist.")
+                    pass
+                    # logging.error(f"Brand {brand_id} does not exist.")
                 else:
                     brand_used_options.append(Brand.objects.get(id=brand_id))
 
             for brand_id in brand_recog_ids:
                 if not Brand.objects.filter(id=brand_id).exists():
-                    logging.error(f"Brand {brand_id} does not exist.")
+                    pass
+                    # logging.error(f"Brand {brand_id} does not exist.")
                 else:
                     brand_recogs.append(Brand.objects.get(id=brand_id))
 
             for scene_id in scene_ids:
                 if not VideoScene.objects.filter(id=scene_id).exists():
-                    logging.error(f"Scene {scene_id} does not exist.")
+                    pass
+                    # logging.error(f"Scene {scene_id} does not exist.")
                 else:
                     scenes.append(VideoScene.objects.get(id=scene_id))
 
+            for audio_clip_id in audio_clip_ids:
+                if not AudioClip.objects.filter(id=audio_clip_id).exists():
+                    pass
+
+                else:
+                    audio_clips.append(AudioClip.objects.get(id=audio_clip_id))
+
             if Experience.objects.filter(user=user).exists():
                 experience = Experience.objects.get(user=user)
-                logging.warning(f"Experience {username} already exists. Updated.")
+                pass
+                # logging.warning(f"Experience {username} already exists. Updated.")
             else:
                 experience = Experience.objects.create(
                     user=user,
                     cc_v=cc_v,
                 )
-                logging.info(f"Experience {username} created.")
+                pass
+                # logging.info(f"Experience {username} created.")
 
             experience.videos.set(videos)
             experience.brands_seen_options.set(brand_seen_options)
@@ -205,4 +251,5 @@ if __name__ == "__main__":
             experience.gaze = int(eyetracker)
             experience.scene_seen.set(scenes)
             experience.cc_v = cc_v
+            experience.audio_seen.set(audio_clips)
             experience.save()

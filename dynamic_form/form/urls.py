@@ -3,6 +3,7 @@ from django.views.generic import TemplateView
 
 from .brand_qa import BrandDescQAView, BrandQAView
 from .calibration import CalibrateView
+from .clip_qa import AudioClipQAView
 from .intro import IntroView
 from .popup import popup_slice
 from .scene_qa import SceneQAView
@@ -18,6 +19,7 @@ urlpatterns = [
     path("experience", experience_view, name="experience"),
     path("brand/<int:brand_id>", BrandQAView, name="brand"),
     path("scene/<int:scene_id>", SceneQAView, name="scene"),
+    path("audio/<int:audio_clip_id>", AudioClipQAView, name="audio_clip"),
     path("survey", SurveyFormView, name="survey"),
     path("calib", CalibrateView, name="calibration"),
     path("consistency_check", consistency_view, name="consistency_check"),

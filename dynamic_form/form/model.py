@@ -51,6 +51,14 @@ class VideoScene(models.Model):
         return self.url
 
 
+class AudioClip(models.Model):
+    video = models.ForeignKey(Video, on_delete=models.CASCADE)
+    url = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.url
+
+
 class Experience(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
     videos = models.ManyToManyField(Video)
@@ -59,6 +67,7 @@ class Experience(models.Model):
     prod_used_options = models.ManyToManyField(Brand, related_name="prod_used")
     brand_recog = models.ManyToManyField(Brand, related_name="brand_recog_options")
     scene_seen = models.ManyToManyField(VideoScene, related_name="scene_seen_options")
+    audio_seen = models.ManyToManyField(AudioClip, related_name="audio_seen_options")
     cc_v = models.IntegerField()
 
     def __str__(self):
