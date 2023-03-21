@@ -11,6 +11,7 @@ from .model import Brand, Experience, UserStage
 class SurveyQA(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     brand_recog = models.ManyToManyField(Brand, related_name="brand_options")
+    mage_id = models.CharField(max_length=100)
     submit_time = models.DateTimeField(auto_now=True)
 
     def __str__(self):
@@ -20,10 +21,14 @@ class SurveyQA(models.Model):
 class SurveyQAForm(forms.ModelForm):
     class Meta:
         model = SurveyQA
-        fields = ["user", "brand_recog"]
+        fields = ["user", "brand_recog", "mage_id"]
         widgets = {
             "user": forms.HiddenInput(),
             "brand_recog": forms.CheckboxSelectMultiple(),
+            "mage_id": forms.TextInput(attrs={"placeholder": "https://www.mage.space/u/XXX..."}),
+        }
+        labels = {
+            "mage_id": "Please provide the URL to your Mage Space profile:",
         }
 
     def __init__(self, *args, **kwargs):
