@@ -25,7 +25,9 @@ class SurveyQAForm(forms.ModelForm):
         widgets = {
             "user": forms.HiddenInput(),
             "brand_recog": forms.CheckboxSelectMultiple(),
-            "mage_id": forms.TextInput(attrs={"placeholder": "https://www.mage.space/u/XXX..."}),
+            "mage_id": forms.TextInput(
+                attrs={"placeholder": "https://www.mage.space/u/XXX..."}
+            ),
         }
         labels = {
             "mage_id": "Please provide the URL to your Mage Space profile:",

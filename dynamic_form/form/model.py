@@ -54,6 +54,8 @@ class VideoScene(models.Model):
 class AudioClip(models.Model):
     video = models.ForeignKey(Video, on_delete=models.CASCADE)
     url = models.CharField(max_length=100)
+    start = models.IntegerField()
+    end = models.IntegerField()
 
     def __str__(self):
         return self.url

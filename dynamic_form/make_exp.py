@@ -15,7 +15,7 @@ columns = ["id", "video_id", "url"]
 scenes.columns = columns
 
 audio_clips = pd.read_csv("data_new/audio_clips.tsv", sep="\t", header=None)
-columns = ["id", "video_id", "url"]
+columns = ["id", "video_id", "url", "start", "end"]
 audio_clips.columns = columns
 
 brands = pd.read_csv("data_new/brands.tsv", sep="\t", header=None)
@@ -25,16 +25,27 @@ brands.columns = columns
 
 def make_experience():
     video_set = videos[~(videos["name"] == "example")].sample(10)
+    out_videos = videos[~videos["id"].isin(video_set["id"])]
     brand_1_2_set = brands.sample(30)
     brand_op_set = video_set["brand_id"].drop_duplicates()
     brand_non_op_set = brands[~brands["id"].isin(brand_op_set)]["id"]
     brand_op_set = pd.concat([brand_op_set, brand_non_op_set.sample(10)])
+
+    out_videos = out_videos[out_videos["brand_id"].isin(brand_op_set)].groupby(
+        "brand_id"
+    )
+    samples = []
+    for brand_id, group in out_videos:
+        samples.append(group.sample(2))
+
+    out_brand_videos = pd.concat(samples)
+
     in_scene_set = scenes[scenes["video_id"].isin(video_set["id"])]
     in_audio_set = audio_clips[audio_clips["video_id"].isin(video_set["id"])]
     out_scene_set = scenes[~scenes["video_id"].isin(video_set["id"])].sample(10)
-    out_audio_set = audio_clips[~audio_clips["video_id"].isin(video_set["id"])].sample(
-        10
-    )
+    out_audio_set = audio_clips[
+        audio_clips["video_id"].isin(out_brand_videos["id"])
+    ].sample(10)
     in_scene_set = in_scene_set.groupby("video_id").apply(lambda x: x.sample(1))
     in_audio_set = in_audio_set.groupby("video_id").apply(lambda x: x.sample(1))
     scene_set = in_scene_set.append(out_scene_set)

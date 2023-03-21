@@ -155,7 +155,7 @@ def video_view(request, video_id, gaze):
     video = Video.objects.get(id=video_id)
     src, length = video.src, video.length
 
-    if length < MIN_TIMER:
+    if length < MIN_TIMER or random.random() < 0.5:
         timer = 1000 * 1000
     else:
         timer = random.randint(MIN_TIMER, max(MIN_TIMER + 1, length - 5000))

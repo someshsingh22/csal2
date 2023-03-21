@@ -25,7 +25,7 @@ django.setup()
 from django.contrib.auth.models import User
 from form.model import AudioClip, Brand, Experience, UserStage, Video, VideoScene
 
-USER_LIMIT = 10
+USER_LIMIT = 50
 
 
 def create_update_brand(name, id):
@@ -106,7 +106,7 @@ def create_update_video_scene(id, video_id, url):
     video_scene.save()
 
 
-def create_update_audio_clip(id, video_id, url):
+def create_update_audio_clip(id, video_id, url, start, end):
     if not Video.objects.filter(id=video_id).exists():
         logging.error(f"VideoScene {id} not created. Video {video_id} does not exist.")
         return
@@ -115,9 +115,11 @@ def create_update_audio_clip(id, video_id, url):
         audio_clip = AudioClip.objects.get(id=id)
         audio_clip.video = video
         audio_clip.url = url
+        audio_clip.start = start
+        audio_clip.end = end
         logging.warning(f"AudioClip {id} already exists. Updated.")
     else:
-        audio_clip = AudioClip.objects.create(id=id, video=video, url=url)
+        audio_clip = AudioClip.objects.create(id=id, video=video, url=url, start=start, end=end)
         logging.info(f"AudioClip {id} created.")
     audio_clip.save()
 
@@ -144,9 +146,9 @@ if __name__ == "__main__":
 
         with open("data_new/audio_clips.tsv") as f:
             reader = csv.reader(f, delimiter="\t")
-            for row in tqdm(reader, total=4424):
-                id, video_id, url = row
-                create_update_audio_clip(id, video_id, url)
+            for row in tqdm(reader, total=3946):
+                id, video_id, url, start, end = row
+                create_update_audio_clip(id, video_id, url, start, end)
 
     with open("data_new/exp.tsv") as f:
         reader = csv.reader(f, delimiter="\t")
