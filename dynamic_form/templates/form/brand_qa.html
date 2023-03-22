@@ -10,9 +10,8 @@
     {% csrf_token %}
     {% for hidden_field in form.hidden_fields %}
         {{ hidden_field }}
-    {% endfor %}
-    <h3>Scene Recreation</h3>
-    <p>Please go to <a href="https://www.mage.space/">mage.space</a> and recreate a scene that you remember from the {{ brand }} ad. Fill your prompts and outputs in prompts.txt and folders 1,2,3,4,5 </p>
+    {% endfor %}    
+    <p><b>Please go to <a href="https://www.mage.space/">mage.space</a> and recreate a scene that you remember from the {{ brand }} ad. Fill your prompts and outputs in prompts.txt and folders 1,2,3,4,5 </b></p>
     {% for field in form.visible_fields %}
         <div class="form-group">
             {{ field.label_tag }}
