@@ -10,6 +10,9 @@ from .model import Brand, Experience, UserStage
 
 
 class Introduction(models.Model):
+    age = models.IntegerField()
+    gender = models.CharField(max_length=1)
+    stream = models.CharField(max_length=100)
     experience = models.OneToOneField(Experience, on_delete=models.CASCADE)
     brands_seen = models.ManyToManyField(Brand, related_name="intro_brands_seen")
     prod_used = models.ManyToManyField(Brand, related_name="intro_prod_used")
@@ -39,6 +42,31 @@ class Introduction(models.Model):
 
 
 class IntroductionForm(forms.ModelForm):
+    age = forms.IntegerField(label="What is your age?", min_value=15, max_value=35, widget=forms.NumberInput(attrs={'placeholder': 'Enter your age'}))
+    gender = forms.ChoiceField(
+        choices=(
+            ('M', "Male"),
+            ('F', "Female"),
+            ('O', "Other"),
+        ),
+        label="What is your gender?",
+        widget=forms.RadioSelect(),
+    )
+    #stream, They can select from ['ECE', 'CSB', 'CSE', 'CSAI', 'CSD', 'CSAM', 'CSSS', "other"] 
+    stream = forms.ChoiceField(
+        choices=(
+            ('ECE', "ECE"),
+            ('CSB', "CSB"),
+            ('CSE', "CSE"),
+            ('CSAI', "CSAI"),
+            ('CSD', "CSD"),
+            ('CSAM', "CSAM"),
+            ('CSSS', "CSSS"),
+            ('OTHER', "Other")
+        ),
+        label="What is your stream?",
+        widget=forms.RadioSelect(),
+    )
     ad_block = forms.ChoiceField(
         choices=((False, "No"), (True, "Yes")),
         widget=forms.RadioSelect,
@@ -64,6 +92,9 @@ class IntroductionForm(forms.ModelForm):
         model = Introduction
         fields = [
             "experience",
+            "age",
+            "gender",
+            "stream",
             "brands_seen",
             "prod_used",
             "ad_block",

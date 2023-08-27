@@ -3,7 +3,7 @@ import random
 import pandas as pd
 
 users = pd.read_csv("data_new/users.tsv", sep="\t", header=None)
-columns = ["id", "email", "name", "pass"]
+columns = ["id", "email", "name", "pass", "video_id"]
 users.columns = columns
 
 videos = pd.read_csv("data_new/videos.tsv", sep="\t", header=None)
@@ -19,12 +19,13 @@ columns = ["id", "video_id", "url", "start", "end"]
 audio_clips.columns = columns
 
 brands = pd.read_csv("data_new/brands.tsv", sep="\t", header=None)
-columns = ["name", "id"]
+columns = ["id", "name"]
 brands.columns = columns
 
 
-def make_experience():
-    video_set = videos[~(videos["name"] == "example")].sample(10)
+def make_experience(sid):
+    vids = users[users['id']==sid]['video_id'].tolist()[0].split(',')
+    video_set = videos[videos["id"].isin([int(v) for v in vids])]
     out_videos = videos[~videos["id"].isin(video_set["id"])]
     brand_1_2_set = brands.sample(30)
     brand_op_set = video_set["brand_id"].drop_duplicates()
@@ -72,9 +73,6 @@ def make_experience():
         consistency_check_video,
     )
 
-
-count = len(users)
-
 (
     video_set_ids,
     brand_1_ids,
@@ -93,7 +91,7 @@ count = len(users)
     [],
 )
 
-for i in range(count):
+for i, sid in enumerate(users["id"].tolist()):
     (
         video_set_id,
         brand_1_id,
@@ -102,7 +100,7 @@ for i in range(count):
         scene_set_id,
         audio_set_id,
         cc_v,
-    ) = make_experience()
+    ) = make_experience(sid)
     video_set_ids.append(video_set_id)
     brand_1_ids.append(brand_1_id)
     brand_2_ids.append(brand_2_id)

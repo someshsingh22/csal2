@@ -5,8 +5,20 @@
 {% endblock %}
 {% block content %}
 <form method="post"> {% csrf_token %} {% for hidden_field in form.hidden_fields %} {{ hidden_field }} {% endfor %}
+  <div class="form-group" style="margin-top: 2em; margin-bottom: 2em;">
+    <h1>Please Fill out the form below!<h1>
+    <h3>{{ form.age.label }}</h3></span>
+    {{ form.age }}
+  </div> {% for error in form.age.errors %}  <div class="alert alert-danger" role="alert">{{ error }}</div> {% endfor %}
+  <div class="form-group" style="margin-top: 2em; margin-bottom: 2em;">
+    <h3>{{ form.gender.label }}</h3></span>
+    {{ form.gender }}
+  </div> {% for error in form.gender.errors %}  <div class="alert alert-danger" role="alert">{{ error }}</div> {% endfor %}
+  <div class="form-group" style="margin-top: 2em; margin-bottom: 2em;">
+    <h3>{{ form.stream.label }}</h3></span>
+    {{ form.stream }}
+  </div> {% for error in form.stream.errors %}  <div class="alert alert-danger" role="alert">{{ error }}</div> {% endfor %}
   <div class="form-group">
-  <h1>Please Fill out the form below!<h1>
     <h3>{{ form.brands_seen.label }}</h3></span>
     <div class="form-options">
       <div class="row">

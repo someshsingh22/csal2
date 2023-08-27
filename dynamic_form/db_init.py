@@ -27,7 +27,6 @@ from form.model import AudioClip, Brand, Experience, UserStage, Video, VideoScen
 
 USER_LIMIT = 50
 
-
 def create_update_brand(name, id):
     if Brand.objects.filter(id=id).exists():
         brand = Brand.objects.get(id=id)
@@ -67,6 +66,7 @@ def create_update_video(id, name, brand_id, src, length, desc, title):
 def create_update_get_user_stage(id, username, name, password):
     if User.objects.filter(id=id).exists():
         user = User.objects.get(id=id)
+        user.username = username
         user.set_password(password)
         user.first_name = name
         logging.warning(f"User {username} already exists. Password updated.")
@@ -129,7 +129,7 @@ if __name__ == "__main__":
         with open("data_new/brands.tsv") as f:
             reader = csv.reader(f, delimiter="\t")
             for row in tqdm(reader, total=276):
-                name, id = row
+                id, name = row
                 create_update_brand(name, id)
 
         with open("data_new/videos.tsv") as f:
@@ -140,7 +140,7 @@ if __name__ == "__main__":
 
         with open("data_new/scenes.tsv") as f:
             reader = csv.reader(f, delimiter="\t")
-            for row in tqdm(reader, total=4424):
+            for row in tqdm(reader, total=3835):
                 id, video_id, url = row
                 create_update_video_scene(id, video_id, url)
 
@@ -157,6 +157,7 @@ if __name__ == "__main__":
             username,
             name,
             password,
+            _,
             video_ids,
             brand_seen_option_ids,
             brand_used_option_ids,

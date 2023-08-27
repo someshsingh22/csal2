@@ -8,7 +8,7 @@ from .model import Experience, UserStage, Video
 from .survey import SurveyQA
 
 WAIT_TIME = datetime.timedelta(milliseconds=10000)
-DESC_FLAG = False
+DESC_FLAG = True
 
 
 def home_view(request):
@@ -150,7 +150,16 @@ def experience_view(request):
                 return redirect("/brand/" + str(brand.id))
     elif stage >= 50 and stage < 70:
         scenes = Experience.objects.get(user=user).scene_seen.all()
-        scene = scenes[user_stage.stage - 50].id
+        try:
+            scene = scenes[user_stage.stage - 50].id
+        except:
+            if user_stage.stage > 65:
+                user_stage.update()
+                user_stage.stage = 70
+                user_stage.save()
+                return redirect("/")
+            else:
+                scene = scenes[user_stage.stage - 50].id
         return redirect("/scene/" + str(scene))
     elif stage >= 70 and stage < 90:
         audios = Experience.objects.get(user=user).audio_seen.all()
