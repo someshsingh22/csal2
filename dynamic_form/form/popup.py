@@ -130,12 +130,11 @@ def popup_slice(request, start, end):
                 popup = Popup(
                     user=user,
                     video=video,
-                    seen_before=video.id in form.cleaned_data["seen_before"],
-                    seen_brand_before=video.brand.id
-                    in form.cleaned_data["seen_brand_before"],
-                    heard_before=video.brand.id in form.cleaned_data["heard_before"],
-                    clear_product=video.id in form.cleaned_data["clear_product"],
-                    clear_brand=video.brand.id in form.cleaned_data["clear_brand"],
+                    seen_before=str(video.id) in form.cleaned_data["seen_before"],
+                    seen_brand_before=str(video.brand.id) in form.cleaned_data["seen_brand_before"],
+                    heard_before=str(video.brand.id) in form.cleaned_data["heard_before"],
+                    clear_product=str(video.id) in form.cleaned_data["clear_product"],
+                    clear_brand=str(video.brand.id) in form.cleaned_data["clear_brand"],
                 )
                 popup.save()
             user_stage.update()
