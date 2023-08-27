@@ -35,6 +35,11 @@ class AudioClipQAForm(forms.ModelForm):
             "seek_time": forms.HiddenInput(),
         }
 
+    def clean_seek_time(self):
+        seek_time = self.cleaned_data.get("seek_time")
+        if seek_time is not None and seek_time <= 3:
+            raise forms.ValidationError("You need to listen to the audio before submitting!")
+        return seek_time
 
 @login_required
 @cache_control(no_cache=True, must_revalidate=True, no_store=True)

@@ -32,6 +32,12 @@ class SurveyQAForm(forms.ModelForm):
         labels = {
             "mage_id": "Please provide the URL to your Mage Space profile:",
         }
+        
+    def clean_mage_id(self):
+        mage_id = self.cleaned_data.get("mage_id")
+        if not mage_id.startswith("https://www.mage.space/u/"):
+            raise forms.ValidationError("Invalid Mage ID, must start with 'https://www.mage.space/u/'.")
+        return mage_id
 
     def __init__(self, *args, **kwargs):
         user = kwargs.pop("user")
